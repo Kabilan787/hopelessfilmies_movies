@@ -1,0 +1,176 @@
+﻿@using HopelessFilmiesMVC.Data
+@using HopelessFilmiesMVC.Models
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var type = ViewData["MediaType"]?.ToString()?.ToLower() ?? "";
+    var heading = type switch
+    {
+        "shortfilms" => "All Short Films",
+        "movies" => "All Movies",
+        "exclusive" => "Exclusive Films",
+        "podcasts" => "All Podcasts",
+        _ => "Media Collection"
+    };
+
+    var searchQuery = ViewData["SearchQuery"]?.ToString() ?? "";
+}
+
+<link rel="stylesheet" href="~/css/all.css" asp-append-version="true" />
+<style>
+    .add-to-cart-icon {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        padding: 6px 10px;
+        font-size: 18px;
+        cursor: pointer;
+        display: none;
+        transition: background 0.3s;
+    }
+
+    .film-card {
+        position: relative;
+    }
+
+        .film-card:hover .add-to-cart-icon {
+            display: block;
+        }
+
+    .cart-button {
+        position: relative;
+    }
+
+    .cart-count {
+        background-color: red;
+        color: white;
+        font-size: 12px;
+        padding: 2px 6px;
+        border-radius: 10px;
+        position: absolute;
+        top: -5px;
+        right: -10px;
+    }
+</style>
+
+<!-- Title + Search + Cart (only for exclusive) -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="media-title">@heading</h2>
+
+    <div class="d-flex align-items-center" style="gap: 12px;">
+        @if (type == "exclusive")
+        {
+            var isSignedIn = User.Identity.IsAuthenticated;
+
+            <a href="@(
+               isSignedIn
+                   ? Url.Action("Index", "Cart")
+                       : Url.Action("SignIn", "Account", new { message = "Please sign in to view your cart." })
+                )" class="btn btn-warning position - relative">
+            🛒 Cart <span id="cart-count" class="badge bg-dark">0</span>
+            </a>
+
+            <script>
+            $(document).ready(function () {
+                $.get('/cart/get', function (res) {
+                    $('#cart-count').text(res.count);
+                });
+            });
+             </script>
+        }
+
+        <form method="get" asp-action="AllMedia" asp-controller="Home" class="media-search-form" style="display:flex; gap: 8px;">
+            <input type="hidden" name="type" value="@type" />
+            <input type="text" name="query" value="@searchQuery" placeholder="Search..." class="form-control" />
+            <button type="submit" class="btn btn-sm btn-primary">Search</button>
+        </form>
+    </div>
+</div>
+
+<!-- No results -->
+@if ((Model is IEnumerable<Film> filmList && !filmList.Any()) ||
+     (Model is IEnumerable<Podcast> podcastList && !podcastList.Any()))
+{
+    <p>No results found.</p>
+}
+else
+{
+    <div class="film-grid">
+        @if (type == "shortfilms" || type == "movies" || type == "exclusive")
+        {
+            var films = Model as IEnumerable<Film>;
+            foreach (var item in films!)
+            {
+                <div class="film-card">
+                    @* Add-to-cart icon only for exclusive *@
+                    @if (type == "exclusive")
+                    {
+                        @* <div class="add-to-cart-icon" onclick="addToCart(@item.Id)">+</div> *@
+                        <a href="javascript:void(0);" class="cart-toggle add-to-cart-icon" data-id="@item.Id" title="Add to Cart">+</a>
+                    }
+
+                    <img src="@item.Image" alt="@item.Heading" class="film-card-image"
+                         onerror="this.onerror=null;this.src='https://placehold.co/640x360/000000/FFFFFF?text=No+Image';" />
+                    <h3 class="film-card-title">@item.Heading</h3>
+                    <div class="film-card-hover-content">
+                        <a href="@Url.Action("Details", "Home", new { id = item.Id, type = type })" class="view-details-link">
+                            View More Details &gt;
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+        else if (type == "podcasts")
+        {
+            var podcasts = Model as IEnumerable<Podcast>;
+            foreach (var item in podcasts!)
+            {
+                <div class="film-card">
+                    <img src="@item.Image" alt="@item.Heading" class="film-card-image"
+                         onerror="this.onerror=null;this.src='https://placehold.co/640x360/000000/FFFFFF?text=No+Image';" />
+                    <h3 class="film-card-title">@item.Heading</h3>
+                    <div class="film-card-hover-content">
+                        <a href="@Url.Action("Details", "Home", new { id = item.Id, type = "podcasts" })" class="view-details-link">
+                            Listen Now &gt;
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+}
+
+@section Scripts {
+    <script>
+                $(document).on("click", ".cart-toggle", function () {
+            const $btn = $(this);
+            const filmId = $btn.data("id");
+
+            $.ajax({
+                url: '/cart/toggle',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(filmId),
+                success: function (response) {
+                    if (response.success) {
+                        if (response.inCart) {
+                            $btn.addClass('in-cart').attr('title', 'Remove from Cart').text('✔');
+                        } else {
+                            $btn.removeClass('in-cart').attr('title', 'Add to Cart').text('+');
+                        }
+                        $('#cart-count').text(response.count);
+                    }
+                },
+                error: function (xhr) {
+                    if (xhr.status === 401) {
+                        window.location.href = "/Account/SignIn?message=Please sign in to add items to cart.";
+                    }
+                }
+            });
+        });
+    </script>
+}
+

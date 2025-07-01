@@ -1,0 +1,1286 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Roboto+Slab:wght@700&display=swap');
+
+/* Base styles for the entire page */
+body {
+    font-family: 'Inter', sans-serif; /* Modern, clean font for general text */
+    margin: 0;
+    background-color: #1a1a1a; /* Dark background for a cinematic feel */
+    color: #f0f0f0; /* Light text color for contrast */
+    line-height: 1.6;
+    /* Removed transition for filter, as blur-background class is removed */
+}
+
+/* Removed body.blur-background styles */
+
+
+/* Common resets for lists */
+.nav-menu, .members-list, .roles, .contact-info-list, .social-link-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header and Navigation Bar Styling */
+.navbar {
+    display: flex;
+    justify-content: space-between; /* Puts logo on one end, nav on the other */
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: #0d0d0d; /* Even darker background for the navbar */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Subtle shadow for depth */
+    border-bottom-left-radius: 10px; /* Rounded corners */
+    border-bottom-right-radius: 10px;
+    position: sticky; /* Make navbar sticky */
+    top: 0;
+    z-index: 1000; /* Ensure navbar stays on top */
+}
+
+.nav-logo {
+    text-decoration: none;
+    color: #e0e0e0; /* Slightly lighter color for the logo link */
+    display: flex;
+    align-items: center;
+}
+
+/* Common font for titles and headings */
+.logo-text, .title, .film-titles, .film-heading, .members-title, .name, .about-title, .contact-section .section-title {
+    font-family: 'Roboto Slab', serif;
+}
+
+.logo-text {
+    font-size: 2.2rem; /* Larger font size for prominence */
+    font-weight: 700;
+    color: #f82121; /* Gold color for the logo, like a movie award */
+    margin: 0; /* Remove default margin */
+    letter-spacing: 1.5px; /* Add some spacing for readability */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Subtle text shadow */
+}
+
+.nav-menu {
+    display: flex; /* Arrange menu items horizontally */
+    gap: 2.5rem; /* Space between menu items */
+    margin-right: auto; /* Push nav menu to the left of the sign-in button */
+    padding-left: 2rem; /* Give some space from the logo */
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #f0f0f0; /* Light color for navigation links */
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 0.5rem 0.8rem;
+    transition: color 0.3s ease, transform 0.3s ease; /* Smooth transition for hover effects */
+    position: relative; /* Needed for underline effect */
+}
+
+    .nav-link::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -1px;
+        left: 0;
+        background-color: #E74C3C; /* Red accent for the underline */
+        transition: width 0.3s ease-out; /* Smooth width transition */
+    }
+
+    .nav-link:hover {
+        color: #E74C3C; /* Red accent on hover */
+        transform: translateY(-2px); /* Slight lift effect */
+    }
+
+        .nav-link:hover::after {
+            width: 500%; /* Expand underline on hover */
+        }
+
+/* Sign In Button */
+.sign-in-btn {
+    background-color: #E74C3C; /* Red button background */
+    color: #ffffff; /* White text */
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    margin-left: 2rem; /* Space from navigation links */
+}
+
+    .sign-in-btn:hover {
+        background-color: #C0392B; /* Darker red on hover */
+        transform: translateY(-2px); /* Lift effect */
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    }
+
+
+/* Mobile menu toggle button styles */
+.menu-toggle {
+    display: none; /* Hidden by default on larger screens */
+    font-size: 2rem;
+    color: #f0f0f0;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+    .menu-toggle:hover {
+        color: #E74C3C;
+    }
+
+/* Responsive adjustments for Navbar */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 1rem; /* Adjust padding for smaller screens */
+        flex-wrap: wrap; /* Allow items to wrap if needed */
+        justify-content: space-between; /* Space out logo, toggle, and sign-in button */
+    }
+
+    .logo-text {
+        font-size: 1.8rem; /* Adjust logo size for smaller screens */
+    }
+
+    .menu-toggle {
+        display: block; /* Show the hamburger icon on small screens */
+        order: 2; /* Order it after logo and sign-in button */
+        margin-left: auto; /* Push it to the right */
+        margin-right: 1rem; /* Space from sign-in button */
+    }
+
+    .sign-in-btn {
+        order: 3; /* Order it after toggle button */
+        margin-left: 0; /* Remove default margin */
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+
+    .nav-menu {
+        flex-direction: column; /* Stack menu items vertically */
+        position: absolute; /* Position menu off-screen */
+        top: 100%; /* Below the navbar */
+        left: 0;
+        width: 100%;
+        background-color: #0d0d0d; /* Same background as navbar */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+        padding: 1rem 0;
+        transform: translateY(-200%); /* Start hidden above the viewport */
+        opacity: 0; /* Initially invisible */
+        transition: transform 0.4s ease-out, opacity 0.4s ease-out; /* Smooth slide and fade */
+        z-index: 999; /* Below navbar, above content */
+        text-align: center; /* Center menu items */
+        margin-right: 0; /* Reset margin */
+        padding-left: 0; /* Reset padding */
+        flex-basis: 100%; /* Take full width below the header items */
+    }
+
+        .nav-menu.active {
+            transform: translateY(0); /* Slide into view */
+            opacity: 1; /* Become visible */
+        }
+
+    .nav-item {
+        margin: 0.5rem 0; /* Vertical spacing for menu items */
+    }
+
+    .nav-link {
+        display: block; /* Make links full width of their container */
+        padding: 0.8rem 1.5rem;
+        font-size: 1.2rem;
+    }
+}
+
+/* Common section padding and margin */
+.intro-section, .films, .team-members, .about, .contact-section, .footer-section {
+    padding: 4rem 2rem;
+    margin-top: 2rem; /* Consistent spacing between sections */
+}
+
+    /* Common content container styles (max-width and centering) */
+    .section-content, .members-content, .about-content, .contact-content, .footer-section .section-content {
+        max-width: 1200px;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+/* Main Content Styling */
+.intro-section {
+    min-height: 80vh; /* Ensure section takes up most of the viewport height */
+    display: flex;
+    align-items: center; /* Vertically center content */
+    justify-content: center; /* Horizontally center content */
+}
+
+    .intro-section .section-content {
+        display: flex; /* Use flexbox for left and right arrangement */
+        justify-content: space-between; /* Push text to left, image to right */
+        align-items: center; /* Vertically align items in the middle */
+        gap: 4rem; /* Space between text and image */
+    }
+
+.intro-details {
+    flex: 1; /* Allow text content to take available space */
+    padding-right: 2rem; /* Add some space before the image */
+    text-align: left; /* Align text to the left */
+}
+
+.title {
+    font-size: 3.5rem; /* Large, impactful title */
+    color: #f43636; /* Gold color for the main title */
+    margin-bottom: 1rem;
+    line-height: 1.2;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7); /* Stronger shadow for main title */
+}
+
+/* Elements using 'Inter' font */
+.subtitle, .film-description, .about-subtitle, .roles {
+    font-family: 'Inter', sans-serif;
+}
+
+.subtitle {
+    font-size: 1.5rem; /* Readable subtitle size */
+    color: #e0e0e0; /* Slightly darker light color for subtitle */
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+/* Common image wrapper styles */
+.intro-image-wrapper, .film-wrapper, .about-image-wrapper {
+    flex: 1; /* Allow image wrapper to take available space */
+    display: flex;
+    justify-content: center; /* Center image within its wrapper */
+    align-items: center;
+}
+
+/* Common image/gif styles for responsiveness and shadows */
+.intro-image, .film-recap {
+    max-width: 100%; /* Ensure image is responsive */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 15px; /* Default for both, can be overridden */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6); /* Default for both, can be overridden */
+    transition: transform 0.3s ease; /* Smooth transition for hover effect */
+}
+
+    .intro-image:hover {
+        transform: scale(1.5); /* Slightly enlarge image on hover */
+    }
+
+/* Responsive adjustments for Main Content and About Content (similar layouts) */
+@media (max-width: 992px) {
+    .intro-section .section-content, .about-content {
+        flex-direction: column; /* Stack text and image vertically */
+        text-align: center; /* Center text when stacked */
+        gap: 3rem; /* Adjust gap for vertical stacking */
+    }
+
+    .intro-details {
+        padding-right: 0; /* Remove right padding when stacked */
+        padding-bottom: 2rem; /* Add bottom padding when stacked */
+    }
+
+    .title {
+        font-size: 2.8rem; /* Adjust title size for tablets */
+    }
+
+    .subtitle {
+        font-size: 1.3rem; /* Adjust subtitle size for tablets */
+    }
+}
+
+@media (max-width: 576px) {
+    .intro-section {
+        padding: 3rem 1rem; /* Reduce padding on very small screens */
+    }
+
+    .title {
+        font-size: 2.2rem; /* Further adjust title size for mobile */
+    }
+
+    .subtitle {
+        font-size: 1.1rem; /* Further adjust subtitle size for mobile */
+    }
+}
+
+/* Films Section Styling */
+.films {
+    background-color: #1a1a1a; /* Consistent dark background */
+    text-align: center;
+}
+
+.film-titles {
+    font-size: 3rem;
+    color: #fa2727; /* Gold color for the title */
+    margin-bottom: 3rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.film {
+    display: flex; /* Use flexbox for side-by-side layout */
+    align-items: center; /* Vertically align content */
+    justify-content: center; /* Center the film block */
+    max-width: 1000px; /* Max width for film content */
+    margin: 0 auto 4rem auto; /* Center with bottom margin for separation */
+    background-color: #0d0d0d; /* Darker background for film cards */
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+    padding: 2.5rem;
+    gap: 3rem; /* Space between text and image/gif */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .film:hover {
+        transform: translateY(-5px); /* Lift effect on hover */
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.8);
+    }
+
+    /* Alternating layout for film entries */
+    .film:nth-child(even) { /* For the 2nd, 4th, etc. .film element */
+        flex-direction: row-reverse; /* Reverse order: image on left, text on right */
+    }
+
+.film-details {
+    flex: 1; /* Allow text details to take available space */
+    text-align: left; /* Default text alignment */
+}
+
+.film:nth-child(even) .film-details {
+    text-align: right;
+}
+
+
+.film-heading {
+    font-size: 2.5rem;
+    color: #ff4545; /* Gold color for film headings */
+    margin-bottom: 0.8rem;
+    line-height: 1.2;
+}
+
+.film-description {
+    font-size: 1.1rem;
+    color: #e0e0e0; /* Light text for description */
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.film-recap { /* Corrected class name, overrides common image styles */
+    border-radius: 10px; /* Specific override */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); /* Specific override */
+}
+
+    .film-recap:hover {
+        transform: scale(1.02); /* Slight enlarge on hover */
+    }
+
+/* Link as a button */
+.watch-link {
+    display: inline-block; /* Allows padding and margin */
+    background-color: #E74C3C; /* Red button background */
+    color: #ffffff; /* White text */
+    text-decoration: none;
+    padding: 0.8rem 1.8rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    margin-top: 1rem; /* Space above the button */
+}
+
+    .link:hover {
+        background-color: #C0392B; /* Darker red on hover */
+        transform: translateY(-2px); /* Lift effect */
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    }
+
+/* Responsive adjustments for Films Section */
+@media (max-width: 992px) {
+    .film {
+        flex-direction: column; /* Stack text and image vertically on smaller screens */
+        text-align: center; /* Center text when stacked */
+        padding: 2rem;
+        gap: 2rem;
+    }
+
+        .film:nth-child(even) {
+            flex-direction: column; /* Ensure stacking for even films too */
+        }
+
+    .film-details {
+        padding: 0; /* Remove side padding when stacked */
+        text-align: center; /* Center text when stacked */
+    }
+
+    .film-heading {
+        font-size: 2rem;
+    }
+
+    .film-description {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .films {
+        padding: 3rem 1rem;
+    }
+
+    .film-titles {
+        font-size: 2.5rem;
+    }
+
+    .film {
+        padding: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .film-heading {
+        font-size: 1.8rem;
+    }
+
+    .film-description {
+        font-size: 0.95rem;
+    }
+
+    .link {
+        padding: 0.7rem 1.5rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* New added css code for shortfilms*/
+
+/*body {
+    margin: 0;
+    background-color: #000;*/ /* Dark background for the whole page */
+    /*font-family: Arial, sans-serif;*/ /* Fallback font */
+    /*color: #fff;
+}*/
+
+/* Common font for titles and headings */
+/*.logo-text, .title, .film-titles, .film-heading, .members-title, .name, .about-title, .contact-section .section-title, .short-films-title, .film-card-title {
+    font-family: 'Roboto Slab', serif;
+}*/
+
+/* Short Films Section Styling */
+/*.short-films-section {
+    background-color: #1a1a1a;*/ /* Consistent dark background */
+    /*padding: 3rem 2rem;*/ /* Add some padding around the section */
+    /*max-width: 1200px;*/ /* Max width for the whole section */
+    /*margin: 2rem auto;*/ /* Center the section on the page */
+    /*border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+}
+
+.short-films-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 2rem;
+    padding: 0 1rem;
+}
+
+.short-films-title {
+    font-size: 2.5rem;
+    color: #fff;*/ /* White for the new title */
+    /*margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.view-all-link {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.7);*/ /* Pale white */
+    /*text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+    .view-all-link:hover {
+        color: #fff;*/ /* Becomes white on hover */
+    /*}
+
+.carousel-wrapper {
+    position: relative;*/ /* For absolute positioning of navigation buttons */
+    /*display: flex;
+    align-items: center;*/ /* Vertically align carousel and buttons */
+    /*margin: 0 -1rem;*/ /* Negative margin to allow partial fourth film and full first film */
+    /*padding: 0 1rem;*/ /* Padding to ensure first and last cards are not cut */
+/*}
+
+.film-carousel {
+    display: flex;
+    overflow-x: hidden;*/ /* Prevent user-initiated scrolling, only allow arrows */
+    /*-webkit-overflow-scrolling: touch;*/ /* Keep for potential smooth transition compatibility if used */
+    /*scrollbar-width: none;*/ /* Hide scrollbar for Firefox */
+    /*-ms-overflow-style: none;*/ /* Hide scrollbar for IE and Edge */
+    /*padding-bottom: 1rem;*/ /* Space for potential scrollbar if not hidden */
+    /*gap: 1.5rem;*/ /* Space between film cards */
+/*}*/
+
+    /* Hide scrollbar for Chrome, Safari, and Opera */
+    /*.film-carousel::-webkit-scrollbar {
+        display: none;
+    }
+
+.film-card {
+    flex-shrink: 0;*/ /* Prevent cards from shrinking */
+    /*width: 300px;*/ /* Card width */
+    /*background-color: #0d0d0d;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, height 0.3s ease, z-index 0.1s ease 0.3s;
+    text-align: center;
+    cursor: pointer;
+    position: relative;*/ /* Needed for positioning the overlay */
+    /*overflow: hidden;*/ /* Hide overflowing content initially */
+    /*display: flex;*/ /* Use flexbox for vertical layout */
+    /*flex-direction: column;
+    justify-content: flex-start;*/ /* Align content to the top */
+    /* Initial height calculated based on image + title */
+    /*height: 230px;*/ /* Base height for image + title */
+/*}
+
+    .film-card:hover {
+        transform: translateY(-5px) scale(1.1);*/ /* Lift and scale slightly */
+        /*box-shadow: 0 15px 30px rgba(0, 0, 0, 0.9);
+        z-index: 20;*/ /* Bring hovered card to front */
+        /*border-radius: 10px;*/ /* Keep consistent border-radius on hover */
+        /* Expanded height for image + title + hover content */
+        /*height: calc(230px + 3.5rem);*/ /* Initial height + height of view-details-link and its padding/margin */
+    /*}
+
+.film-card-image {
+    width: 100%;
+    height: 168.75px;*/ /* Adjusted height for 300px width (16:9 aspect ratio: 300 / 16 * 9) */
+    /*object-fit: cover;*/ /* Cover the area, cropping if necessary */
+    /*border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.film-card-title {
+    font-size: 1.2rem;
+    color: #e0e0e0;
+    margin-top: 1rem;
+    padding: 0 0.5rem;
+    white-space: normal;*/ /* Allow title to wrap */
+    /*overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.film-card-hover-content {
+    background-color: #0d0d0d;*/ /* Background for the expanded section */
+    /*display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;*/ /* Padding inside the expanded section */
+    /*box-sizing: border-box;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    width: 100%;*/
+    /* No absolute positioning here, it flows naturally below the title */
+/*}
+
+.film-card:hover .film-card-hover-content {
+    opacity: 1;
+    visibility: visible;
+}
+
+.view-details-link {
+    display: inline-block;
+    background-color: #E74C3C;*/ /* Red button background */
+    /*color: #ffffff;*/ /* White text */
+    /*text-decoration: none;
+    padding: 0.8rem 1.8rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    margin-top: 0.5rem;*/ /* Space above the button */
+/*}
+
+    .view-details-link:hover {
+        background-color: #C0392B;*/ /* Darker red on hover */
+        /*transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    }
+
+.carousel-nav-btn {
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;*/ /* Ensure buttons are above carousel items */
+    /*transition: background 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+    .carousel-nav-btn:hover {
+        background: rgba(0, 0, 0, 0.8);
+        transform: translateY(-50%) scale(1.1);
+    }
+
+.left-arrow {
+    left: 0;
+    margin-left: 1rem;*/ /* Keep arrows slightly inside the container */
+/*}
+
+.right-arrow {
+    right: 0;
+    margin-right: 1rem;*/ /* Keep arrows slightly inside the container */
+/*}*/
+
+/* Responsive adjustments */
+/*@media (max-width: 1024px) {
+    .film-card {
+        width: 280px;*/ /* Adjusted card width for smaller screens */
+        /*height: 210px;*/ /* Adjust initial height */
+    /*}
+
+        .film-card:hover {
+            transform: translateY(-5px) scale(1.08);*/ /* Slightly less aggressive scale */
+            /*height: calc(210px + 3rem);*/ /* Adjust expanded height */
+        /*}
+
+    .film-card-image {
+        height: 157.5px;*/ /* Adjusted height for 16:9 */
+    /*}
+
+    .short-films-title {
+        font-size: 2.2rem;
+    }
+
+    .view-all-link {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .short-films-section {
+        padding: 2rem 1rem;
+        margin: 1rem auto;
+    }
+
+    .short-films-title {
+        font-size: 2rem;
+    }
+
+    .film-card {
+        width: 220px;*/ /* Adjusted card width for tablet-like screens */
+        /*height: 180px;*/ /* Adjust initial height */
+    /*}
+
+        .film-card:hover {
+            transform: translateY(-3px) scale(1.05);*/ /* Further reduce scale */
+            /*height: calc(180px + 2.5rem);*/ /* Adjust expanded height */
+        /*}
+
+    .film-card-image {
+        height: 123.75px;*/ /* Adjusted height for 16:9 */
+    /*}
+
+    .carousel-nav-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 1.2rem;
+    }
+
+    .film-card-title {
+        font-size: 1.1rem;
+    }
+
+    .view-details-link {
+        font-size: 0.9rem;
+        padding: 0.7rem 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .short-films-header {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+    }
+
+    .short-films-title {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .view-all-link {
+        align-self: flex-end;*/ /* Align view all to the right */
+    /*}
+
+    .carousel-wrapper {
+        margin: 0;*/ /* Remove negative margin on small screens */
+        /*padding: 0;
+        flex-wrap: wrap;*/ /* Allow cards to wrap on smaller screens */
+        /*justify-content: center;*/ /* Center cards when wrapped */
+    /*}
+
+    .film-carousel {
+        overflow-x: hidden;*/ /* Keep hidden on small screens too */
+        /*flex-wrap: wrap;*/ /* Allow wrapping of cards to prevent horizontal scroll */
+        /*justify-content: center;*/ /* Center cards when wrapped */
+        /*padding-top: 1rem;*/ /* Add padding to prevent cards touching top */
+    /*}
+
+    .film-card {
+        width: 90%;*/ /* Make card nearly full width on very small screens */
+        /*max-width: 300px;*/ /* Limit max width for a single card */
+        /*margin: 0 auto 1.5rem auto;*/ /* Center individual cards when stacked */
+        /*height: auto;*/ /* Allow height to adjust on small screens */
+    /*}
+
+    .film-card-image {
+        height: 168.75px;*/ /* Adjusted height for 16:9 */
+    /*}
+
+    .film-card:hover {
+        transform: none;*/ /* Disable scaling on hover for very small screens if it causes layout issues */
+        /*box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+        z-index: auto;
+        height: auto;*/ /* Reset height on hover for small screens */
+    /*}
+
+    .film-card-hover-content {
+        opacity: 1;*/ /* Always visible on small screens */
+        /*visibility: visible;
+        padding-top: 0.5rem;*/ /* Reduce padding */
+    /*}
+
+    .left-arrow, .right-arrow {
+        position: static;*/ /* Make arrows static on very small screens */
+        /*transform: none;
+        margin: 1rem 0.5rem;*/ /* Adjust button margin */
+    /*}
+}*/
+
+    
+
+/* Team Members Section Styling */
+.team-members {
+    background-color: #0d0d0d; /* Dark background for this section */
+    text-align: center;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    padding: 4rem 2rem; /* Consistent padding */
+}
+
+.members-title {
+    font-size: 3rem;
+    color: #ff3030; /* Gold color for the title */
+    margin-bottom: 3rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.members-content {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.slider-container {
+    position: relative; /* For positioning arrows */
+    display: flex;
+    align-items: center; /* Vertically align carousel and arrows */
+    justify-content: center; /* Center the carousel */
+    width: 100%;
+    max-width: 500px; /* Max width for the carousel container */
+    margin: 0 auto;
+    overflow: hidden; /* Hide extra carousel items */
+    border-radius: 15px; /* Consistent rounded corners */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+}
+
+.carousel-inner {
+    display: flex; /* Arrange items horizontally */
+    transition: transform 0.5s ease-in-out; /* Smooth slide transition */
+    width: 100%; /* Take full width of slider-container */
+}
+
+.carousel-item {
+    min-width: 100%; /* Each item takes full width of carousel-inner */
+    box-sizing: border-box; /* Include padding in width */
+    display: flex; /* To center the member card if it's smaller */
+    justify-content: center;
+    align-items: center;
+    padding: 1rem; /* Padding inside the carousel item */
+}
+
+.members {
+    flex: 0 0 auto; /* Prevent items from shrinking or growing, maintain their size */
+    width: 280px; /* Fixed width for each member card */
+    background-color: #1a1a1a; /* Card background */
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    /* Removed scroll-snap-align as it's now controlled by JS clicks */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .members:hover {
+        transform: translateY(-5px); /* Lift effect on hover */
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+    }
+
+.member-image {
+    width: 150px; /* Fixed width for member images */
+    height: 150px; /* Fixed height for member images */
+    border-radius: 50%; /* Make images circular */
+    object-fit: cover; /* Ensure images cover the area without distortion */
+    border: 4px solid #E74C3C; /* Red border around the image */
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.name {
+    font-size: 1.8rem;
+    color: #f66666; /* Gold color for names */
+    margin-top: 0.5rem;
+    margin-bottom: 0.8rem;
+}
+
+.roles {
+    font-size: 1rem;
+    color: #cccccc; /* Lighter grey for roles */
+    line-height: 1.4;
+}
+
+    .roles li {
+        margin-bottom: 0.3rem;
+    }
+
+.nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(231, 76, 60, 0.8); /* Red accent, slightly transparent */
+    color: white;
+    border: none;
+    padding: 1rem 0.8rem; /* Adjusted padding for better button size */
+    border-radius: 8px; /* Rounded corners */
+    cursor: pointer;
+    font-size: 1.5rem; /* Larger icon size */
+    z-index: 10; /* Ensure arrows are above carousel items */
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+    .nav-arrow:hover {
+        background-color: #C0392B; /* Darker red on hover */
+        transform: translateY(-50%) scale(1.05); /* Slight enlarge on hover */
+    }
+
+    .nav-arrow.left-arrow {
+        left: 10px; /* Position on the left */
+    }
+
+    .nav-arrow.right-arrow {
+        right: 10px; /* Position on the right */
+    }
+
+    .nav-arrow:disabled {
+        background-color: rgba(100, 100, 100, 0.5); /* Grey out when disabled */
+        cursor: not-allowed;
+    }
+
+
+/* Responsive adjustments for Team Members Section */
+@media (max-width: 768px) {
+    .team-members {
+        padding: 3rem 1rem;
+    }
+
+    .members-title {
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .slider-container {
+        max-width: 350px; /* Smaller max width for tablets */
+    }
+
+    .members {
+        width: 250px; /* Slightly smaller card width for smaller screens */
+        padding: 1rem;
+    }
+
+    .member-image {
+        width: 120px;
+        height: 120px;
+    }
+
+    .name {
+        font-size: 1.5rem;
+    }
+
+    .roles {
+        font-size: 0.9rem;
+    }
+
+    .nav-arrow {
+        font-size: 1.2rem; /* Smaller arrows */
+        padding: 0.8rem 0.6rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .slider-container {
+        max-width: 300px; /* Even smaller max width for very small screens */
+    }
+
+    .members {
+        width: 220px; /* Even smaller card width for very small screens */
+    }
+
+    .nav-arrow {
+        padding: 0.6rem 0.4rem;
+        font-size: 1rem;
+    }
+}
+
+/* About Section Styling */
+.about {
+    background-color: #0d0d0d; /* Dark background for this section */
+    text-align: center;
+    border-radius: 15px; /* Consistent rounded corners */
+}
+
+.about-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4rem;
+    flex-direction: row-reverse; /* Image on left, text on right */
+}
+
+.about-details {
+    flex: 1;
+    text-align: left; /* Text on the right, so align left relative to its container */
+}
+
+.about-title {
+    font-size: 3rem;
+    color: #ff3030;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.about-subtitle {
+    font-size: 1.1rem;
+    color: #e0e0e0;
+    line-height: 1.6;
+    margin-bottom: 2rem; /* Space before social links */
+}
+
+.about-image {
+    width: 400px; /* Fixed size for circular image */
+    height: 400px;
+    border-radius: 50%; /* Make it circular */
+    object-fit: cover; /* Ensure image fills the circle */
+    border: 5px solid #E74C3C; /* Accent border */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+    transition: transform 0.3s ease;
+}
+
+    .about-image:hover {
+        transform: scale(1.05);
+    }
+
+.social-links {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-start; /* Align social icons to the left with text */
+    gap: 1.5rem; /* Space between icons */
+}
+
+/* Removed CSS transitions for social links as JS will handle it */
+/* .social-link, .social-link-contact {
+    transition: color 0.3s ease, transform 0.3s ease;
+} */
+
+.social-link {
+    color: #f0f0f0; /* Default icon color */
+    font-size: 2.5rem; /* Large icon size */
+    /* Added transition for JavaScript controlled effects */
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+/* Removed hover effects as JS will handle it */
+/* .social-link:hover {
+    color: #FFD700;
+    transform: translateY(-3px);
+} */
+
+/* Specific colors for social icons - these will be set by JS on hover now */
+/* .social-link.facebook:hover { color: #3b5998; }
+.social-link.instagram:hover { color: #C13584; }
+.social-link.twitter:hover { color: #1DA1F2; } */
+
+
+/* Responsive adjustments for About Section */
+@media (max-width: 992px) {
+    /* Grouped with intro section content */
+    .about-details {
+        text-align: center;
+    }
+
+    .social-links {
+        justify-content: center;
+    }
+
+    .about-title {
+        font-size: 2.5rem;
+    }
+
+    .about-subtitle {
+        font-size: 1.rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .about {
+        padding: 3rem 1rem;
+    }
+
+    .about-title {
+        font-size: 2rem;
+    }
+
+    .about-image {
+        width: 200px;
+        height: 200px;
+    }
+
+    .social-link {
+        font-size: 2rem;
+    }
+}
+
+/* Contact Section Styling */
+.contact-section {
+    background-color: #f8f8f8; /* Pale white background */
+    color: #333; /* Darker text for contrast on light background */
+    text-align: center;
+    border-radius: 15px;
+}
+
+    .contact-section .section-title { /* Specificity for this section's title */
+        font-size: 3rem;
+        color: #E74C3C; /* Red accent for the contact title */
+        margin-bottom: 3rem;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+.contact-content {
+    display: flex;
+    justify-content: center; /* Center the two columns */
+    align-items: flex-start; /* Align items to the top */
+    max-width: 1000px; /* Specific max-width for contact content */
+    margin: 0 auto;
+    gap: 4rem; /* Space between contact info and form */
+}
+
+/* Common card styles for contact info and form */
+.contact-info-list, .contact-form {
+    background-color: #ffffff; /* White background for the info card */
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 2.5rem;
+    flex: 1;
+}
+
+.contact-info-list {
+    text-align: left;
+}
+
+.contact-info {
+    display: flex; /* For icon and text side-by-side */
+    align-items: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    color: #555;
+}
+
+    .contact-info:last-child {
+        margin-bottom: 0; /* No bottom margin for the last item */
+    }
+
+    .contact-info .icon { /* Icon styles common to contact info list */
+        font-size: 1.8rem;
+        color: #E74C3C;
+        margin-right: 1rem;
+        width: 30px;
+        text-align: center;
+    }
+
+    /* Specific icon colors for social media within contact info */
+    .contact-info .fa-facebook-f {
+        color: #3b5998;
+    }
+
+    .contact-info .fa-instagram {
+        color: #C13584;
+    }
+
+    .contact-info .fa-twitter {
+        color: #1DA1F2;
+    }
+
+.social-link-contact { /* This is also grouped for transition */
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #555;
+    gap: 0.5rem;
+}
+
+    .social-link-contact:hover {
+        color: #E74C3C;
+    }
+
+.contact-form {
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: #333;
+    background-color: #f0f0f0; /* Slightly off-white for input fields */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .form-input:focus {
+        border-color: #E74C3C; /* Red border on focus */
+        box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2); /* Subtle glow on focus */
+        outline: none;
+    }
+
+textarea.form-input {
+    resize: vertical; /* Allow vertical resizing */
+    min-height: 120px; /* Minimum height for textarea */
+}
+
+.submit-button {
+    background-color: #E74C3C; /* Red button */
+    color: #ffffff;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+    .submit-button:hover {
+        background-color: #C0392B; /* Darker red on hover */
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+/* Responsive adjustments for Contact Section */
+@media (max-width: 768px) {
+    .contact-content {
+        flex-direction: column; /* Stack contact info and form vertically */
+        gap: 3rem;
+    }
+
+    .contact-info-list,
+    .contact-form {
+        padding: 2rem; /* Adjust padding for smaller screens */
+        width: 100%; /* Make them fill the full width */
+        box-sizing: border-box; /* Include padding in the width calculation */
+    }
+
+    .contact-info {
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .contact-section {
+        padding: 3rem 1rem;
+    }
+
+        .contact-section .section-title {
+            font-size: 2.5rem;
+        }
+
+    .contact-info-list,
+    .contact-form {
+        padding: 1.5rem;
+    }
+
+    .form-input {
+        padding: 0.8rem;
+        font-size: 0.95rem;
+    }
+
+    .submit-button {
+        padding: 0.9rem 1.8rem;
+        font-size: 1rem;
+    }
+}
+
+/* Footer Section Styling */
+.footer-section {
+    background-color: #0d0d0d; /* Dark background for the footer */
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    color: #f0f0f0; /* Light text color */
+}
+
+    .footer-section .section-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+.copyright-text {
+    margin: 0;
+    font-size: 1rem;
+    color: #cccccc; /* Slightly muted text for copyright */
+}
+
+.social-link-list {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.footer-section .social-link-contact { /* Targeting social links specifically in the footer */
+    color: #f0f0f0; /* Default icon color in footer */
+    font-size: 1.8rem; /* Slightly smaller icons for footer */
+    display: block; /* Make it a block to easily center the icon */
+    text-align: center;
+}
+
+    .footer-section .social-link-contact:hover {
+        color: #FFD700;
+        transform: translateY(-2px);
+    }

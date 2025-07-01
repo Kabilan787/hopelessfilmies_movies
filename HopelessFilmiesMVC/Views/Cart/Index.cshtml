@@ -1,0 +1,122 @@
+﻿@{
+    ViewData["Title"] = "Your Cart";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    decimal standardPrice = 199;
+}
+
+<link rel="stylesheet" href="~/css/cart.css" asp-append-version="true" />
+
+<div class="cart-container d-flex justify-content-between flex-wrap">
+    <!-- LEFT: Cart Items -->
+    <div class="cart-items w-100 w-md-65">
+        <h2 class="mb-4">Exclusive Movies in Your Cart</h2>
+        <div id="cart-items-container">
+            <p class="text-muted">Loading cart items...</p>
+        </div>
+    </div>
+
+    <!-- RIGHT: Summary -->
+    <div class="cart-summary w-100 w-md-30 mt-4 mt-md-0 ms-md-4 border rounded p-3 shadow">
+        <h3 class="mb-3">Summary</h3>
+        <p><strong>Total Items:</strong> <span id="cart-total-count">0</span></p>
+        <p><strong>Total Price:</strong> ₹<span id="cart-total-price">0</span></p>
+        <button class="btn btn-success w-100 mt-3" id="proceedBtn" disabled>Proceed to Buy</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function renderCartItems(items) {
+            const container = $('#cart-items-container');
+            container.empty();
+
+            if (items.length === 0) {
+                container.html(`<p class="text-muted">Your cart is empty.</p>`);
+                $('#cart-total-count').text('0');
+                $('#cart-total-price').text('0');
+                $('#proceedBtn').prop('disabled', true);
+                return;
+            }
+
+            items.forEach(item => {
+                const cartItem = `
+                    <div class="cart-item d-flex mb-4 p-3 border rounded shadow-sm">
+                        <img src="${item.image}" alt="${item.heading}" class="cart-item-image me-3"
+                             onerror="this.onerror=null;this.src='https://placehold.co/150x100/000000/FFFFFF?text=No+Image';" />
+                        <div class="cart-item-details flex-grow-1">
+                            <h4>${item.heading}</h4>
+                            <p><strong>Language:</strong> ${item.language}</p>
+                            <p><strong>Year:</strong> ${item.year}</p>
+                            <p><strong>Price:</strong> ₹199</p>
+                            <button class="btn btn-danger btn-sm mt-2 remove-from-cart" data-id="${item.id}">
+                                Remove from Cart
+                            </button>
+                        </div>
+                    </div>`;
+                container.append(cartItem);
+            });
+
+            $('#cart-total-count').text(items.length);
+            $('#cart-total-price').text(items.length * 199);
+            $('#proceedBtn').prop('disabled', false);
+        }
+
+        $(document).ready(function () {
+            // Load cart
+            $.get('/cart/get', function (res) {
+                renderCartItems(res.items);
+            });
+
+            // Remove item from cart
+            $(document).on('click', '.remove-from-cart', function () {
+                const id = $(this).data('id');
+
+                $.ajax({
+                    url: '/cart/remove',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(id),
+                    success: function (res) {
+                        if (res.success) {
+                            $.get('/cart/get', function (res2) {
+                                renderCartItems(res2.items);
+                                $('#cart-count').text(res2.count); // Update badge if used globally
+                            });
+                        }
+                    }
+                });
+            });
+
+            // Proceed button click (optional logic)
+            $('#proceedBtn').click(function () {
+                $.ajax({
+                    url: '/cart/checkout',
+                    method: 'POST',
+                    success: function (res) {
+                        if (res.success) {
+                            $('<div class="alert alert-success position-fixed top-0 end-0 m-4 shadow">')
+                                .text(res.message)
+                                .appendTo('body')
+                                .delay(3000)
+                                .fadeOut(500, function () { $(this).remove(); });
+                            $('#cart-count').text('0'); // Reset cart badge
+                            $('#cart-items-container').html(`<p class="text-muted">Your cart is empty.</p>`);
+                            $('#cart-total-count').text('0');
+                            $('#cart-total-price').text('0');
+                            $('#proceedBtn').prop('disabled', true);
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error("Checkout failed", xhr);
+                        const errorMsg = xhr.responseJSON?.message || xhr.responseText || "Unknown error";
+                        alert("Something went wrong. Please try again.\n\n" + errorMsg);
+                    }
+
+               });
+           });
+
+        });
+    </script>
+
+
+}

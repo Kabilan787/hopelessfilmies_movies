@@ -1,0 +1,409 @@
+﻿@model HopelessFilmiesMVC.Models.AdminManageViewModel
+
+@{
+    ViewData["Title"] = $"Manage {Model.Category}";
+    var isPodcast = Model.Category == "Podcasts";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* General page styling */
+    body {
+        background-color: #1a1a1a; /* Dark background */
+        font-family: 'Inter', sans-serif; /* Using Inter font */
+        color: #f0f0f0; /* Light text color for general content */
+    }
+
+    .page-container {
+        padding: 30px;
+        background-color: #2c2c2c; /* Darker container background, consistent with login */
+        border-radius: 15px; /* Rounded corners */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Subtle shadow */
+        margin: 30px auto; /* Center the container with margin */
+        max-width: 1200px; /* Max width for the content */
+        color: white;
+    }
+
+    h2 {
+        color: #ff5733; /* Red color for heading, consistent with dashboard */
+        font-weight: 600;
+        margin-bottom: 30px;
+        text-align: center; /* Center the heading */
+        font-size: 2.5em;
+    }
+
+    /* Add New Item Button Styling */
+    .add-new-btn-container {
+        text-align: right;
+        margin-bottom: 25px;
+    }
+
+    .btn-add-custom {
+        background-color: #4CAF50; /* Greenish color for add */
+        color: white;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        border: none;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        display: inline-flex; /* Align icon and text */
+        align-items: center;
+        gap: 8px;
+    }
+
+        .btn-add-custom:hover {
+            background-color: #45a049;
+            transform: translateY(-2px); /* Slight lift effect */
+            color: white; /* Ensure text color remains white on hover */
+        }
+
+        .btn-add-custom i {
+            font-size: 1.2em;
+        }
+
+    /* Table Styling */
+    .table-custom {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        color: #f0f0f0; /* Light text color */
+    }
+
+        .table-custom thead {
+            background-color: #3f3f3f; /* Darker header background */
+        }
+
+        .table-custom th,
+        .table-custom td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #444; /* Darker border */
+        }
+
+        .table-custom tbody tr:hover {
+            background-color: #333; /* Slightly lighter on hover */
+        }
+
+    /* Action Buttons in Table */
+    .action-buttons .btn {
+        padding: 8px 15px;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .action-buttons .btn-warning {
+        background-color: #ffc107; /* Bootstrap warning yellow */
+        border-color: #ffc107;
+        color: #212529; /* Dark text for warning */
+    }
+
+        .action-buttons .btn-warning:hover {
+            background-color: #e0a800;
+            border-color: #e0a800;
+            transform: translateY(-1px);
+        }
+
+    .action-buttons .btn-danger {
+        background-color: #dc3545; /* Bootstrap danger red */
+        border-color: #dc3545;
+        color: white;
+    }
+
+        .action-buttons .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+            transform: translateY(-1px);
+        }
+
+    /* Custom Modal Styles */
+    .custom-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+        .custom-modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+    .custom-modal-content {
+        background-color: #3f3f3f; /* Dark modal background */
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+        transform: translateY(-20px);
+        transition: transform 0.3s ease;
+        color: white;
+    }
+
+    .custom-modal-overlay.show .custom-modal-content {
+        transform: translateY(0);
+    }
+
+    .custom-modal-content h3 {
+        color: #ff5733; /* Red title */
+        margin-bottom: 20px;
+        font-size: 1.8em;
+    }
+
+    .custom-modal-content p {
+        margin-bottom: 30px;
+        font-size: 1.1em;
+    }
+
+    .custom-modal-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+
+        .custom-modal-buttons .btn {
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .custom-modal-buttons .btn-confirm {
+            background-color: #dc3545; /* Red for confirm delete */
+            color: white;
+            border: none;
+        }
+
+            .custom-modal-buttons .btn-confirm:hover {
+                background-color: #c82333;
+            }
+
+        .custom-modal-buttons .btn-cancel {
+            background-color: #6c757d; /* Gray for cancel */
+            color: white;
+            border: none;
+        }
+
+            .custom-modal-buttons .btn-cancel:hover {
+                background-color: #5a6268;
+            }
+
+    .no-items-message {
+        text-align: center;
+        padding: 40px;
+        background-color: #3f3f3f;
+        border-radius: 10px;
+        margin-top: 20px;
+        font-size: 1.2em;
+        color: #b0b0b0;
+    }
+</style>
+
+<div class="page-container">
+    <h2>@ViewData["Title"]</h2>
+
+    <div class="add-new-btn-container">
+        <a href="@Url.Action("AddMedia", "Admin", new { category = Model.Category })"
+           class="btn-add-custom">
+            <i class="bi bi-plus-circle"></i> Add @Model.Category
+        </a>
+    </div>
+
+    @if (isPodcast)
+    {
+        if (Model.Podcasts != null && Model.Podcasts.Any())
+        {
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th style="width: 30%;">Title</th>
+                        <th style="width: 20%;">Language</th>
+                        <th style="width: 20%;">Year</th>
+                        <th style="width: 30%;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Podcasts)
+                    {
+                        <tr>
+                            <td>@item.Heading</td>
+                            <td>@item.Language</td>
+                            <td>@item.Year</td>
+                            <td class="action-buttons">
+                                <a href="@Url.Action("EditMedia", "Admin", new { id = item.Id, category = "Podcasts" })"
+                                   class="btn btn-sm btn-warning me-2" title="Edit">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <button class="btn btn-sm btn-danger delete-button"
+                                        data-id="@item.Id"
+                                        data-category="Podcasts"
+                                        title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="no-items-message">No podcasts found.</p>
+        }
+    }
+    else
+    {
+        if (Model.Films != null && Model.Films.Any())
+        {
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th style="width: 30%;">Title</th>
+                        <th style="width: 20%;">Language</th>
+                        <th style="width: 20%;">Year</th>
+                        <th style="width: 30%;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Films)
+                    {
+                        <tr>
+                            <td>@item.Heading</td>
+                            <td>@item.Language</td>
+                            <td>@item.Year</td>
+                            <td class="action-buttons">
+                                <a href="@Url.Action("EditMedia", "Admin", new { id = item.Id, category = Model.Category })"
+                                   class="btn btn-sm btn-warning me-2" title="Edit">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <button class="btn btn-sm btn-danger delete-button"
+                                        data-id="@item.Id"
+                                        data-category="@Model.Category"
+                                        title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="no-items-message">No items found in this category.</p>
+        }
+    }
+</div>
+
+<!-- Custom Delete Confirmation Modal -->
+<div id="deleteConfirmationModal" class="custom-modal-overlay">
+    <div class="custom-modal-content">
+        <h3>Confirm Deletion</h3>
+        <p>Are you sure you want to delete this item? This action cannot be undone.</p>
+        <div class="custom-modal-buttons">
+            <button id="confirmDeleteBtn" class="btn btn-confirm">Delete</button>
+            <button id="cancelDeleteBtn" class="btn btn-cancel">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Alert Modal (for errors) -->
+<div id="alertModal" class="custom-modal-overlay">
+    <div class="custom-modal-content">
+        <h3 id="alertModalTitle">Error</h3>
+        <p id="alertModalMessage"></p>
+        <div class="custom-modal-buttons">
+            <button id="closeAlertBtn" class="btn btn-cancel">OK</button>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        // Function to show the custom alert modal
+        function showAlertModal(title, message) {
+            $('#alertModalTitle').text(title);
+            $('#alertModalMessage').text(message);
+            $('#alertModal').addClass('show');
+        }
+
+        // Function to hide the custom alert modal
+        function hideAlertModal() {
+            $('#alertModal').removeClass('show');
+        }
+
+        // Event listener for closing the alert modal
+        $(document).on("click", "#closeAlertBtn", hideAlertModal);
+
+        // Variables to store item details for deletion
+        let itemIdToDelete = null;
+        let itemCategoryToDelete = null;
+        let $rowToDelete = null;
+
+        // Event listener for delete button click
+        $(document).on("click", ".delete-button", function () {
+            itemIdToDelete = $(this).data("id");
+            itemCategoryToDelete = $(this).data("category");
+            $rowToDelete = $(this).closest("tr");
+
+            // Show the custom confirmation modal
+            $('#deleteConfirmationModal').addClass('show');
+        });
+
+        // Event listener for confirm delete button in modal
+        $(document).on("click", "#confirmDeleteBtn", function () {
+            $('#deleteConfirmationModal').removeClass('show'); // Hide modal immediately
+
+            $.ajax({
+                url: '/Admin/DeleteMedia',
+                method: 'POST',
+                data: {
+                    id: itemIdToDelete,
+                    category: itemCategoryToDelete
+                },
+                success: function (res) {
+                    if (res.success) {
+                        $rowToDelete.fadeOut(300, function () {
+                            $(this).remove();
+                            // Reset variables
+                            itemIdToDelete = null;
+                            itemCategoryToDelete = null;
+                            $rowToDelete = null;
+                        });
+                    } else {
+                        showAlertModal("Deletion Failed", res.message || "Failed to delete item.");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    showAlertModal("Error", "An error occurred while deleting the item. Please try again.");
+                    console.error("AJAX Error: ", status, error, xhr.responseText);
+                }
+            });
+        });
+
+        // Event listener for cancel delete button in modal
+        $(document).on("click", "#cancelDeleteBtn", function () {
+            $('#deleteConfirmationModal').removeClass('show');
+            // Reset variables
+            itemIdToDelete = null;
+            itemCategoryToDelete = null;
+            $rowToDelete = null;
+        });
+    </script>
+}

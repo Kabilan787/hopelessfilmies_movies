@@ -1,0 +1,66 @@
+﻿@model List<HopelessFilmiesMVC.Data.Film>
+@{
+    ViewData["Title"] = "My Movies";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/all.css" asp-append-version="true" />
+
+<h2 class="mb-4">Purchased Movies</h2>
+
+@if (!Model.Any())
+{
+    <p>You have not purchased any movies yet.</p>
+}
+else
+{
+    <div class="film-grid">
+        @foreach (var item in Model)
+        {
+            <div class="film-card position-relative">
+                <img src="@item.Image" alt="@item.Heading" class="film-card-image"
+                     onerror="this.onerror=null;this.src='https://placehold.co/640x360/000000/FFFFFF?text=No+Image';" />
+                <h3 class="film-card-title">@item.Heading</h3>
+
+                <div class="film-card-hover-content">
+                    <a href="@Url.Action("Details", "Home", new { id = item.Id, type = "exclusive" })" class="view-details-link">
+                        View More Details &gt;
+                    </a>
+                </div>
+
+                <button class="btn btn-sm btn-danger remove-from-purchased position-absolute end-0"
+                        style="top: 6rem;" data-title="@item.Heading" title="Remove from your list">
+                    Remove
+                </button>
+            </div>
+
+        }
+    </div>
+}
+
+@section Scripts {
+    <script>
+        $(document).on('click', '.remove-from-purchased', function () {
+            const $btn = $(this);
+            const title = $btn.data('title');
+
+            if (!confirm(`Are you sure you want to remove "${title}" from your list?`)) return;
+
+            $.ajax({
+                url: '/Account/RemoveMovie',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(title),
+                success: function (res) {
+                    if (res.success) {
+                        $btn.closest('.film-card').fadeOut(400, function () {
+                            $(this).remove();
+                        });
+                    } else {
+                        alert(res.message || "Failed to remove movie.");
+                    }
+                }
+            });
+        });
+    </script>
+}

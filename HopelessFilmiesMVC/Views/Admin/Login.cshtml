@@ -1,0 +1,131 @@
+﻿@{
+    ViewData["Title"] = "Login"; // Changed title to "Login"
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* Custom styles to match the image */
+    body {
+        background-color: #1a1a1a; /* Dark background */
+        font-family: 'Inter', sans-serif; /* Using Inter font */
+        margin: 0; /* Ensure no default body margin */
+        /* Removed flexbox properties from body to avoid interfering with _Layout.cshtml */
+    }
+
+    /* This wrapper will handle centering the login form within the content area */
+    .content-center-wrapper {
+        display: flex;
+        justify-content: center; /* Center horizontally */
+        align-items: center; /* Center vertically */
+        /* This min-height attempts to make the wrapper take up the available vertical space
+               between the header and footer. The '100px' is an approximate placeholder for
+               the combined height of a typical header and footer. You might need to adjust
+               this value based on the actual heights defined in your _Layout.cshtml. */
+        min-height: calc(100vh - 100px);
+        padding: 20px 0; /* Add some vertical padding for spacing */
+    }
+
+    .login-container {
+        background-color: #2c2c2c; /* Darker container background */
+        padding: 40px;
+        border-radius: 15px; /* Rounded corners */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Subtle shadow */
+        width: 100%;
+        max-width: 400px; /* Max width for the form */
+        text-align: center;
+        color: #f0f0f0; /* Light text color */
+    }
+
+    h2 {
+        color: #ff5733; /* Red color for "Admin Login" title */
+        font-size: 2.5em;
+        margin-bottom: 30px;
+        font-weight: bold;
+    }
+
+    .form-control {
+        background-color: #3f3f3f; /* Darker input background */
+        border: none;
+        color: #f0f0f0; /* Light text color for input */
+        padding: 15px 20px;
+        border-radius: 10px; /* Rounded input fields */
+        margin-bottom: 20px;
+        width: calc(100% - 40px); /* Adjust width for padding */
+        box-sizing: border-box; /* Include padding in width */
+    }
+
+        .form-control::placeholder {
+            color: #b0b0b0; /* Placeholder color */
+        }
+
+        .form-control:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 87, 51, 0.5); /* Red focus glow */
+        }
+
+    .btn-primary {
+        background-color: #ff5733; /* Red button background */
+        border: none;
+        color: white; /* White text on button */
+        padding: 15px 30px;
+        border-radius: 10px; /* Rounded button */
+        font-size: 1.2em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease; /* Smooth transition */
+        width: 100%;
+        margin-top: 10px;
+    }
+
+        .btn-primary:hover {
+            background-color: #e04a2c; /* Slightly darker red on hover */
+        }
+
+    .alert-danger {
+        background-color: #ff5733; /* Red alert background */
+        color: white;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+
+    .signup-link {
+        margin-top: 30px;
+        font-size: 0.9em;
+        color: #b0b0b0;
+    }
+
+        .signup-link a {
+            color: #ff5733; /* Red color for "Sign Up" link */
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+            .signup-link a:hover {
+                text-decoration: underline;
+            }
+</style>
+
+<div class="content-center-wrapper">
+    <div class="login-container">
+        <h2>Admin Login</h2>
+
+        @if (ViewBag.Message != null)
+        {
+            <div class="alert alert-danger">@ViewBag.Message</div>
+        }
+
+        <form method="post" asp-action="Login" asp-controller="Admin">
+            <div class="mb-3">
+                <input type="email" name="email" class="form-control" placeholder="Email" required />
+            </div>
+            <div class="mb-3">
+                <input type="password" name="password" class="form-control" placeholder="Password" required />
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+
+        
+    </div>
+</div>

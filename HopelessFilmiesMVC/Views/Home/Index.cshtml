@@ -1,0 +1,249 @@
+﻿@model HopelessFilmiesMVC.Models.HomeViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+@using HopelessFilmiesMVC.Data
+
+<main>
+    <link rel="stylesheet" href="~/css/all.css" asp-append-version="true" />
+    <section class="intro-section">
+        <div class="section-content">
+            <div class="intro-details">
+                <h1 class="title">Only for Filmies!</h1>
+                <h2 class="subtitle">
+                    Welcome to our website where
+                    you can find interesting and exciting short films
+                    to make your day&#127871;&#127871;&#127871;
+                </h2>
+            </div>
+            <div class="intro-image-wrapper">
+                <img src="~/images/hopeless.gif" alt="Logo" class="intro-image">
+            </div>
+        </div>
+    </section>
+
+    <section class="about" id="about">
+        <div class="about-content">
+            <div class="about-details">
+                <h1 class="about-title">About Us!&#128170;</h1>
+                <h2 class="about-subtitle">
+                    We are group of engineering students
+                    who are interested in film-making.Through efficient team work
+                    and segregating the tasks among us we have made some good films
+                    during our college time.Hope you enjoy it!
+                </h2>
+                <div class="social-links">
+                    <!-- Added id for JS targeting for interactive effect -->
+                    <a href="#" class="social-link facebook" id="facebookLink" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link instagram" id="instagramLink" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link twitter" id="twitterLink" target="_blank"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+            <div class="about-image-wrapper">
+                <img src="~/images/about.jpg" alt="About" class="about-image">
+            </div>
+        </div>
+    </section>
+
+    <section class="media-section">
+        <link rel="stylesheet" href="~/css/films.css" asp-append-version="true" />
+
+        <!-- 1. Short Films -->
+        <div class="media-group">
+            <div class="media-header">
+                <h2 class="media-title">Short Films</h2>
+                <a href="@Url.Action("AllMedia", "Home", new { type = "shortfilms" })" class="view-all-link">View All &gt;</a>
+            </div>
+            <div class="carousel-wrapper">
+                <button class="carousel-nav-btn left-arrow" aria-label="Previous shortfilms">&#8249;</button>
+                <div class="film-carousel">
+                    @foreach (var item in Model.ShortFilms)
+                    {
+                        <div class="film-card">
+                            <img src="@item.Image" alt="@item.Heading" class="film-card-image"
+                                 onerror="this.onerror=null;this.src='https://placehold.co/640x360/000000/FFFFFF?text=No+Image';">
+                            <h3 class="film-card-title">@item.Heading</h3>
+                            <div class="film-card-hover-content">
+                                <a href="@Url.Action("Details", "Home", new { id = item.Id, type = "shortfilms" })" class="view-details-link">View More Details &gt;</a>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <button class="carousel-nav-btn right-arrow" aria-label="Next shortfilms">&#8250;</button>
+            </div>
+        </div>
+
+
+        <!-- 2. Movies -->
+        <div class="media-group">
+            <div class="media-header">
+                <h2 class="media-title">Movies</h2>
+                <a href="@Url.Action("AllMedia", "Home", new { type = "movies" })" class="view-all-link">View All &gt;</a>
+            </div>
+            <div class="carousel-wrapper">
+                <button class="carousel-nav-btn left-arrow" aria-label="Previous movies">&#8249;</button>
+                <div class="film-carousel">
+                    @foreach (var item in Model.Movies)
+                    {
+                        <div class="film-card">
+                            <img src="@item.Image" alt="@item.Heading" class="film-card-image"
+                                 onerror="this.onerror=null;this.src='https://placehold.co/640x360/000000/FFFFFF?text=No+Image';">
+                            <h3 class="film-card-title">@item.Heading</h3>
+                            <div class="film-card-hover-content">
+                                <a href="@Url.Action("Details", "Home", new { id = item.Id, type = "movies" })" class="view-details-link">View More Details &gt;</a>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <button class="carousel-nav-btn right-arrow" aria-label="Next movies">&#8250;</button>
+            </div>
+        </div>
+
+        <!-- 3. Podcasts -->
+        <div class="media-group">
+            <div class="media-header">
+                <h2 class="media-title">Podcasts</h2>
+                <a href="@Url.Action("AllMedia", "Home", new { type = "podcasts" })" class="view-all-link">View All &gt;</a>
+            </div>
+            <div class="carousel-wrapper">
+                <button class="carousel-nav-btn left-arrow" aria-label="Previous podcasts">&#8249;</button>
+                <div class="film-carousel">
+                    @if (Model.Podcasts != null && Model.Podcasts.Any())
+                    {
+                        foreach (var item in Model.Podcasts)
+                        {
+                            <div class="film-card">
+                                <img src="@item.Image" alt="@item.Heading" class="film-card-image"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/640x360/000000/FFFFFF?text=No+Image';" />
+                                <h3 class="film-card-title">@item.Heading</h3>
+                                <div class="film-card-hover-content">
+                                    <a href="@Url.Action("Details", "Home", new { id = item.Id, type = "podcasts" })" class="view-details-link">
+                                        Listen Now &gt;
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p>No podcasts found.</p>
+                    }
+                </div>
+                <button class="carousel-nav-btn right-arrow" aria-label="Next podcasts">&#8250;</button>
+            </div>
+        </div>
+
+
+    </section>
+
+    <section>
+
+        <div class="media-group">
+            <div class="media-header">
+                <h2 class="media-title">Exclusive Films</h2>
+                <a href="@Url.Action("AllMedia", "Home", new { type = "exclusive" })" class="view-all-link">View All &gt;</a>
+            </div>
+            <div class="carousel-wrapper">
+                <button class="carousel-nav-btn left-arrow" aria-label="Previous shortfilms">&#8249;</button>
+                <div class="film-carousel">
+                    @foreach (var item in Model.Exclusive)
+                    {
+                        <div class="film-card">
+                            <img src="@item.Image" alt="@item.Heading" class="film-card-image"
+                                 onerror="this.onerror=null;this.src='https://placehold.co/640x360/000000/FFFFFF?text=No+Image';">
+                            <h3 class="film-card-title">@item.Heading</h3>
+                            <div class="film-card-hover-content">
+                                <a href="@Url.Action("Details", "Home", new { id = item.Id, type = "shortfilms" })" class="view-details-link">View More Details &gt;</a>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <button class="carousel-nav-btn right-arrow" aria-label="Next shortfilms">&#8250;</button>
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- Link to your external JavaScript file -->
+    <script src="~/js/site.js"></script>
+
+    <section class="team-members" id="members">
+        <h1 class="members-title">Team Members</h1>
+        <div class="members-content">
+            <div class="slider-container" id="membersSliderContainer">
+                <button class="nav-arrow left-arrow" id="prevMemberBtn"><i class="fas fa-chevron-left"></i></button>
+                <div class="carousel-inner" id="carouselInner">
+                    <!-- Team members will be dynamically loaded here by script.js -->
+                    @{
+                        var members = StaticDataStore.TeamMembers;
+                    }
+                    @foreach (TeamMember item in members)
+                    {
+                        <div class="carousel-item">
+                            <li class="members">
+                                <img src="@item.Image" alt="Member" class="member-image">
+                                <h2 class="name">@item.Name</h2>
+                                <ul class="roles">
+                                    @foreach (string role in item.Roles)
+                                    {
+                                       <li>@role</li> 
+                                    }
+                                    
+                                </ul>
+                            </li>
+                        </div>
+                    }
+                    
+                </div>
+                <button class="nav-arrow right-arrow" id="nextMemberBtn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact-section" id="contact">
+        <h1 class="section-title">Contact Us</h1>
+        <div class="contact-content">
+            <ul class="contact-info-list" id="contactInfoList">
+                <!-- Contact info will be dynamically loaded here by script.js -->
+                @{
+                    var infos = StaticDataStore.ContactInfos;
+                }
+                @foreach (ContactInfo item in infos)
+                {
+                    <li class="contact-info">
+                        @if (item.IsLink)
+                        {
+                            <i class="@item.IconClass icon"></i>
+                            <p>@item.Text</p>
+                        }
+                        else
+                        {
+                            <a href="@item.Link" target="_blank" class="social-link-contact">
+                                <i class="@item.IconClass icon"></i>
+                                <p>@item.Text</p>
+                            </a>
+                        }
+                    </li>
+                }
+
+
+            </ul>
+
+            <form id="contactForm" class="contact-form">
+                <input type="text" name="name" placeholder="Your name" class="form-input" required />
+                <input type="email" name="email" placeholder="Your email" class="form-input" required />
+                <textarea name="message" placeholder="Your message" class="form-input" required></textarea>
+                <button type="submit" class="submit-button" id="contactSubmitButton">Submit</button>
+            </form>
+
+            <!-- Popup element -->
+            <div id="contactPopup" class="popup-message" style="display: none;"></div>
+
+
+        </div>
+    </section>
+
+</main>
+

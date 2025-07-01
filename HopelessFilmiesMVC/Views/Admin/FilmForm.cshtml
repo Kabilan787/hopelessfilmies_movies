@@ -1,0 +1,364 @@
+﻿@model dynamic
+
+@{
+    var isEdit = Model != null && Model.Id > 0;
+    var isPodcast = Model.GetType().Name == "Podcast";
+    var title = isEdit ? "Edit" : "Add";
+    title += isPodcast ? " Podcast" : " Film";
+    ViewData["Title"] = title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* General page styling */
+    body {
+        background-color: #1a1a1a; /* Dark background */
+        font-family: 'Inter', sans-serif; /* Using Inter font */
+        color: #f0f0f0; /* Light text color for general content */
+    }
+
+    .form-container {
+        padding: 30px;
+        background-color: #2c2c2c; /* Darker container background, consistent with login */
+        border-radius: 15px; /* Rounded corners */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Subtle shadow */
+        margin: 30px auto; /* Center the container with margin */
+        max-width: 700px; /* Max width for the form content */
+        color: white;
+    }
+
+    h2 {
+        color: #ff5733; /* Red color for heading, consistent with dashboard */
+        font-weight: 600;
+        margin-bottom: 30px;
+        text-align: center; /* Center the heading */
+        font-size: 2.5em;
+    }
+
+    /* Form Input Styling */
+    .form-label {
+        color: #f0f0f0; /* Light label text */
+        margin-bottom: 8px;
+        display: block; /* Ensure label is on its own line */
+        font-weight: 500;
+    }
+
+    .form-control {
+        background-color: #3f3f3f; /* Darker input background */
+        border: none;
+        color: #f0f0f0; /* Light text color for input */
+        padding: 12px 15px;
+        border-radius: 10px; /* Rounded input fields */
+        margin-bottom: 20px;
+        width: 100%; /* Full width */
+        box-sizing: border-box; /* Include padding in width */
+    }
+
+    .form-control:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(255, 87, 51, 0.5); /* Red focus glow */
+    }
+
+    textarea.form-control {
+        min-height: 100px; /* Min height for textarea */
+        resize: vertical; /* Allow vertical resizing */
+    }
+
+    /* Buttons Styling */
+    .btn-primary-custom {
+        background-color: #ff5733; /* Red button background */
+        border: none;
+        color: white; /* White text on button */
+        padding: 12px 25px;
+        border-radius: 10px; /* Rounded button */
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-primary-custom:hover {
+        background-color: #e04a2c; /* Slightly darker red on hover */
+        transform: translateY(-2px); /* Slight lift effect */
+    }
+
+    .btn-secondary-custom {
+        background-color: #6c757d; /* Gray for cancel */
+        border: none;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 10px;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-secondary-custom:hover {
+        background-color: #5a6268;
+        transform: translateY(-2px);
+    }
+
+    /* Custom Modal Styles (copied from previous immersive for consistency) */
+    .custom-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .custom-modal-overlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .custom-modal-content {
+        background-color: #3f3f3f; /* Dark modal background */
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+        transform: translateY(-20px);
+        transition: transform 0.3s ease;
+        color: white;
+    }
+
+    .custom-modal-overlay.show .custom-modal-content {
+        transform: translateY(0);
+    }
+
+    .custom-modal-content h3 {
+        color: #ff5733; /* Red title */
+        margin-bottom: 20px;
+        font-size: 1.8em;
+    }
+
+    .custom-modal-content p {
+        margin-bottom: 30px;
+        font-size: 1.1em;
+    }
+
+    .custom-modal-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .custom-modal-buttons .btn {
+        padding: 10px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .custom-modal-buttons .btn-ok { /* Renamed for general use in alert modal */
+        background-color: #6c757d; /* Gray for OK */
+        color: white;
+        border: none;
+    }
+
+    .custom-modal-buttons .btn-ok:hover {
+        background-color: #5a6268;
+    }
+</style>
+
+<div class="form-container">
+    <h2>@title</h2>
+
+    <form id="mediaForm" asp-action="SaveMedia" method="post">
+        <input type="hidden" name="Id" value="@(isEdit ? Model.Id : 0)" />
+        <input type="hidden" name="Category" value="@(isPodcast ? "Podcasts" : (Model != null ? Model.Category : ""))" />
+
+        @if (isPodcast)
+        {
+            <div class="mb-3">
+                <label class="form-label">Title</label>
+                <input name="Heading" value="@(isEdit ? Model.Heading : "")" class="form-control" required />
+            </div>
+        }
+        else
+        {
+            <div class="mb-3">
+                <label class="form-label">Heading</label>
+                <input name="Heading" value="@(isEdit ? Model.Heading : "")" class="form-control" required />
+            </div>
+        }
+
+        <div class="mb-3">
+            <label class="form-label">Language</label>
+            <input name="Language" value="@(isEdit ? Model.Language : "")" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Year</label>
+            <input name="Year" value="@(isEdit ? Model.Year : "")" class="form-control" type="number" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea name="Description" class="form-control">@(isEdit ? Model.Description : "")</textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Image URL</label>
+            <input name="Image" value="@(isEdit ? Model.Image : "")" class="form-control" />
+        </div>
+
+        @if (isPodcast)
+        {
+            <div class="mb-3">
+                <label class="form-label">Host</label>
+                <input name="Host" value="@(isEdit ? Model.Host : "")" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Guest (comma-separated)</label>
+                <input name="GuestsString" value="@(isEdit ? Model.GuestsString : "")" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Duration (e.g., 01:30:00)</label>
+                <input name="Duration" value="@(isEdit ? Model.Duration : "")" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Link</label>
+                <input name="Link" value="@(isEdit ? Model.Link : "")" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Genre (comma-separated)</label>
+                <input name="GenreString" value="@(isEdit ? Model.GenreString : "")" class="form-control" />
+            </div>
+        }
+        else
+        {
+            <div class="mb-3">
+                <label class="form-label">Link</label>
+                <input name="Link" value="@(isEdit ? Model.Link : "")" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Genre (comma-separated)</label>
+                <input name="Genre"
+                       value="@(isEdit && Model.Genre != null ? (Model.Genre is string ? Model.Genre : string.Join(", ", Model.Genre)) : "")"
+                       class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Writer</label>
+                <input name="Writer" value="@(isEdit ? Model.Writer : "")" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Director</label>
+                <input name="Director" value="@(isEdit ? Model.Director : "")" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Stars (comma-separated)</label>
+                <input name="StarsString" value="@(isEdit ? Model.StarsString : "")" class="form-control" />
+            </div>
+        }
+
+        <button type="submit" id="submitButton" class="btn-primary-custom">@title</button>
+        <a href="@Url.Action("Manage", "Admin", new { category = isPodcast ? "Podcasts" : (Model != null ? Model.Category : "") })" class="btn-secondary-custom ms-2">Cancel</a>
+    </form>
+</div>
+
+<!-- Custom Alert Modal (for success/errors) -->
+<div id="alertModal" class="custom-modal-overlay">
+    <div class="custom-modal-content">
+        <h3 id="alertModalTitle"></h3>
+        <p id="alertModalMessage"></p>
+        <div class="custom-modal-buttons">
+            <button id="closeAlertBtn" class="btn btn-ok">OK</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        // Function to show the custom alert modal
+        function showAlertModal(title, message) {
+            $('#alertModalTitle').text(title);
+            $('#alertModalMessage').text(message);
+            $('#alertModal').addClass('show');
+        }
+
+        // Function to hide the custom alert modal
+        function hideAlertModal() {
+            $('#alertModal').removeClass('show');
+        }
+
+        // Event listener for closing the alert modal
+        $(document).on("click", "#closeAlertBtn", hideAlertModal);
+
+        $(document).ready(function () {
+            $('#mediaForm').submit(function (e) {
+                e.preventDefault(); // Prevent full form submit
+
+                const form = $(this);
+                const formData = form.serialize();
+
+                $.ajax({
+                    type: 'POST',
+                    url: form.attr('action'),
+                    data: formData,
+                    success: function (response) {
+                        console.log("AJAX Success Response:", response); // Log the full response
+                        if (response.success) {
+                            showAlertModal("Success", "Item saved successfully!");
+                            // Optional: redirect after a short delay or immediately
+                            setTimeout(function() {
+                                window.location.href = "/Admin/Manage?category=" + $('input[name="Category"]').val();
+                            }, 1500); // Redirect after 1.5 seconds
+                        } else {
+                            // If response.success is explicitly false, show server message
+                            showAlertModal("Error", response.message || "Failed to save item. Server indicated failure.");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // Log detailed error information
+                        console.error("AJAX Error - Status:", status);
+                        console.error("AJAX Error - Error Thrown:", error);
+                        console.error("AJAX Error - XHR Object:", xhr);
+                        console.error("AJAX Error - Response Text:", xhr.responseText);
+
+                        // Try to parse JSON response if available, otherwise show generic error
+                        let errorMessage = "An unknown error occurred while saving the item. Please check the console for details.";
+                        try {
+                            const errorResponse = JSON.parse(xhr.responseText);
+                            errorMessage = errorResponse.message || errorResponse.error || errorMessage;
+                        } catch (e) {
+                            // If responseText is not JSON, use default error message or status text
+                            if (xhr.status === 0) {
+                                errorMessage = "Network error or server not reachable. Please check your internet connection.";
+                            } else if (xhr.status === 200) {
+                                errorMessage = "Server responded successfully, but the response format was unexpected. (Status 200, but not valid JSON)";
+                            } else {
+                                errorMessage = `Server error: ${xhr.status} ${xhr.statusText || error}`;
+                            }
+                        }
+                        showAlertModal("Error", errorMessage);
+                    }
+                });
+            });
+        });
+    </script>
+}

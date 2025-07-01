@@ -1,0 +1,155 @@
+﻿<!DOCTYPE html>
+
+@using HopelessFilmiesMVC.Data
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Hopeless Filmies</title>
+
+    <!-- Link to your external CSS file -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons (play, plus) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <a href="~/" class="nav-logo">
+                <h2 class="logo-text">Hopeless Filmies</h2>
+            </a>
+            <!-- Mobile menu toggle button -->
+            <div class="menu-toggle" id="mobileMenuToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-menu" id="mainNavMenu">
+                <li class="nav-item">
+                    <a href="#about" class="nav-link">About Us</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#films" class="nav-link">Our Films</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#members" class="nav-link">Team Members</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#contact" class="nav-link">Contact Us</a>
+                </li>
+                @{
+                    var isSignedIn = User.Identity.IsAuthenticated;
+                }
+
+                <li class="nav-item">
+                    <a href="@(
+                       isSignedIn
+                           ? Url.Action("MyMovies", "Account")
+                                   : Url.Action("SignIn", "Account", new { 
+                                                        message = "Please sign in to view your purchased movies." })
+                               )" class="nav-link">My Movies
+                    </a>
+                </li>
+            </ul>
+            @* <button class="sign-in-btn" id="signInBtn">Sign In</button> *@
+            <button class="sign-in-btn" id="signInBtn" data-signed-in="@User.Identity.IsAuthenticated.ToString().ToLower()">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <span>Sign Out</span>
+                }
+                else
+                {
+                    <span>Sign In</span>
+                }
+            </button>
+
+            <script>
+                const $signInBtn = $('#signInBtn');
+
+                // Function to update button text based on the 'data-signed-in' attribute
+                // This is primarily for initial page load rendering from the server.
+                // The button's text is now directly set by Razor initially.
+                // This function will primarily be for subsequent dynamic updates if needed,
+                // though the redirects after login/logout often mean a full page reload.
+                function updateSignInButtonText() {
+                    const isSignedIn = $signInBtn.data('signed-in') === true; // Check data attribute
+                    $signInBtn.text(isSignedIn ? 'Sign Out' : 'Sign In');
+                }
+
+                $signInBtn.on('click', function () {
+                    // The 'data-signed-in' attribute reflects the initial state.
+                    // For clicks, we always redirect to the appropriate server endpoint.
+                    const isSignedIn = $(this).data('signed-in') === true; // Get current state from data attribute
+
+                    if (isSignedIn) {
+                        // Redirect to the server-side SignOut route
+                        window.location.href = '/Account/SignOut'; // No returnUrl typically needed for logout
+                    } else {
+                        // Redirect to the server-side SignIn route, passing current URL as returnUrl
+                        window.location.href = '/Account/SignIn?returnUrl=' + encodeURIComponent(window.location.href);
+                    }
+                });
+
+                // Call on document ready to ensure initial state is correctly set (though Razor handles initial text)
+                // This call is less critical now that Razor sets the initial text, but good practice if dynamic changes are possible.
+                $(document).ready(function() {
+                    updateSignInButtonText();
+                });
+            </script>
+
+        </nav>
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+        
+    
+
+    <footer class="footer-section">
+        <div class="section-content">
+            <p class="copyright-text">&#169; Hopeless Filmies</p>
+            <ul class="social-link-list">
+                <li>
+                    <a href="#" target="_blank" class="social-link-contact">
+                        <i class="fab fa-facebook-f icon"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" target="_blank" class="social-link-contact">
+                        <i class="fab fa-instagram icon"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" target="_blank" class="social-link-contact">
+                        <i class="fab fa-twitter icon"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </footer>
+
+    <!-- jQuery Library (ensure this matches your default MVC template's jQuery path or update as needed) -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script> 
+    <!-- Your main script -->
+     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @RenderSection("Scripts", required: false)
+    
+</body>
+</html>
+
+@section Scripts {
+    <script>
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    </script>
+}

@@ -1,0 +1,207 @@
+﻿@{
+    Layout = null;
+    
+    var message = ViewBag.Message as string;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - Hopeless Filmies</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style type="text/css">
+        /* Import Google Fonts - same as main site for consistency */
+        @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Roboto+Slab:wght@700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background-color: #1a1a1a; /* Dark background */
+            color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Full viewport height */
+            text-align: center;
+        }
+
+        .signin-container {
+            background-color: #0d0d0d; /* Darker background for the container */
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+            width: 90%;
+            max-width: 450px;
+            box-sizing: border-box; /* Include padding in width */
+        }
+
+        .signin-title {
+            font-family: 'Roboto Slab', serif;
+            font-size: 2.5rem;
+            color: #E74C3C; /* Red accent */
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .signin-message {
+            color: #FFD700; /* Gold for messages */
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .signin-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .signin-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background-color: #2a2a2a; /* Darker input background */
+            color: #f0f0f0;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            box-sizing: border-box; /* Include padding in width */
+        }
+
+            .signin-input::placeholder {
+                color: #bbb;
+            }
+
+            .signin-input:focus {
+                border-color: #E74C3C;
+                box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.3);
+                outline: none;
+            }
+
+        .signin-submit-btn {
+            background-color: #E74C3C;
+            color: white;
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 700;
+            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            margin-top: 1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+            .signin-submit-btn:hover {
+                background-color: #C0392B;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+            }
+
+        .signup-link-container {
+            margin-top: 25px;
+            font-size: 0.95rem;
+            color: #ccc;
+        }
+
+        .signup-link {
+            color: #E74C3C;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+            .signup-link:hover {
+                color: #FFD700;
+                text-decoration: underline;
+            }
+
+        @@media (max-width: 576px) {
+            .signin-container {
+                padding: 30px 20px;
+            }
+
+            .signin-title {
+                font-size: 2rem;
+            }
+
+            .signin-message {
+                font-size: 1rem;
+            }
+
+            .signin-input {
+                font-size: 0.95rem;
+            }
+
+            .signin-submit-btn {
+                padding: 0.9rem 1.2rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+    <div class="signin-container">
+  
+        <h2 class="signin-title">Sign In</h2>
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <p class="signin-message">@message</p>
+        }
+        <form class="signin-form" method="post" asp-action="SignIn" asp-controller="Account">
+            <!-- <input type="hidden" name="returnUrl" value="@@returnUrl" /> -->
+            <input type="text" name="email" placeholder="Email" class="signin-input" required />
+            <input type="password" name="password" placeholder="Password" class="signin-input" required />
+            <button type="submit" class="signin-submit-btn">Sign In</button>
+        </form>
+        <div class="signup-link-container">
+            <p>Don't have an account? <a href="#" class="signup-link" id="signup-but">Sign Up</a></p>
+
+            <script>
+                const $signUpBtn = $('#signup-but');
+
+                $signUpBtn.on('click', function () {
+                    // Redirects to the SignUp Page
+                    const returnUrl = window.location.href;
+                    window.location.href = '/Account/SignUp';
+                });
+            </script>
+        </div>
+
+    </div>
+
+    <script>
+        // Razor-injected value to detect signed-in status
+        const isUserSignedIn = @User.Identity.IsAuthenticated.ToString().ToLower();
+
+        // Redirects to Sign In page with optional message
+        function redirectToSignInPage(message) {
+            let signInUrl = '/Account/SignIn';
+            if (message) {
+                signInUrl += '?message=' + encodeURIComponent(message);
+            }
+            window.location.href = signInUrl;
+        }
+
+        // Click handler for film links
+        $('.watch-link').off('click').on('click', function (event) {
+            if (!isUserSignedIn) {
+                event.preventDefault(); // Prevents navigating to the film
+                redirectToSignInPage('Please sign in to watch our films');
+            } else {
+                // Optional: open film in a new tab if user is signed in
+                $(this).attr('target', '_blank');
+            }
+        });
+
+        // Document ready hook (now minimal and clean)
+        $(document).ready(function () {
+            // No pendingFilmLink logic — clean and intentional
+            // You can add any user-specific setup here in future
+        });
+    </script>
+
+</body>
+</html>
