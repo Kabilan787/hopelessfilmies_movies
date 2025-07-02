@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using HopelessFilmiesMVC.Models;
+using HopelessFilmies.Domain.Models;
 
-namespace HopelessFilmiesMVC.Data
+namespace HopelessFilmiesMVC.DataAccess.Database
 {
     public class UserDbContext : DbContext
     {
@@ -16,7 +16,7 @@ namespace HopelessFilmiesMVC.Data
         public DbSet<Film> Films { get; set; }
         public DbSet<Podcast> Podcasts { get; set; }
 
-        public DbSet<AdminDetails> Admins { get; set; }
+        public DbSet<Admin> Admins { get; set; }
 
         //protected override void OnModelCreating(ModelBuilder modelBuilder)
         //{

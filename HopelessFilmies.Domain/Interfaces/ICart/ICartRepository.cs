@@ -1,0 +1,14 @@
+﻿using HopelessFilmies.Domain.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace HopelessFilmies.Domain.Interfaces.ICart
+{
+    public interface ICartRepository
+    {
+        Task<List<Film>> GetCartAsync(List<int> ids);
+    }
+}

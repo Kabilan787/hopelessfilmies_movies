@@ -3,18 +3,19 @@ using HopelessFilmiesMVC.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
+using HopelessFilmies.Domain.Interfaces.ICart;
 
 namespace HopelessFilmiesMVC.Controllers
 {
     [Route("cart")]
     public class CartController : Controller
     {
-        private readonly UserDbContext _context;
+        private readonly ICartService _cartService;
         private const int StandardPrice = 199;
 
-        public CartController(UserDbContext context)
+        public CartController(ICartService cartService)
         {
-            _context = context;
+            _cartService = cartService;
         }
 
         public IActionResult Index()
@@ -24,10 +25,10 @@ namespace HopelessFilmiesMVC.Controllers
         }
 
         [HttpGet("get")]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
             var ids = GetCartIds();
-            var items = _context.Films.Where(f => ids.Contains(f.Id) && f.Category == "Exclusive").ToList();
+            var items = await _cartService.GetCartAsync(ids);
             return Json(new
             {
                 count = items.Count,
@@ -36,23 +37,6 @@ namespace HopelessFilmiesMVC.Controllers
             });
         }
 
-        //[HttpPost("toggle")]
-        //public IActionResult Toggle([FromBody] int id)
-        //{
-        //    var cart = GetCartIds();
-        //    bool added = false;
-
-        //    if (cart.Contains(id))
-        //        cart.Remove(id);
-        //    else
-        //    {
-        //        cart.Add(id);
-        //        added = true;
-        //    }
-
-        //    SaveCartIds(cart);
-        //    return Json(new { success = true, inCart = added, count = cart.Count });
-        //}
 
         [HttpPost("toggle")]
         public IActionResult Toggle([FromBody] int id)
