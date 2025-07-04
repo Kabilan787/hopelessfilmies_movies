@@ -1,17 +1,20 @@
-﻿using HopelessFilmiesMVC.Data;
+﻿using HopelessFilmies.Domain.Interfaces.IAdmin;
+using HopelessFilmies.Domain.Interfaces.ICart;
+using HopelessFilmiesMVC.Data;
 using HopelessFilmiesMVC.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace HopelessFilmiesMVC.Controllers
 {
     public class AdminController : Controller
     {
-        private readonly UserDbContext _context;
+        private readonly IAdminService _adminService;
 
-        public AdminController(UserDbContext context)
+        public AdminController(IAdminService adminService)
         {
-            _context = context;
+            _adminService = adminService;
         }
 
         // GET: /Admin/Login
@@ -26,7 +29,7 @@ namespace HopelessFilmiesMVC.Controllers
         [HttpPost]
         public IActionResult Login(string email, string password)
         {
-            var admin = _context.Admins.FirstOrDefault(a => a.Email == email && a.Password == password);
+            var admin = _adminService.CheckAdminAsync(email, password);
 
             if (admin != null)
             {
@@ -54,17 +57,18 @@ namespace HopelessFilmiesMVC.Controllers
 
 
         // GET: /Admin/Manage?category=ShortFilm|Movies|Exclusive|Podcasts
-        public IActionResult Manage(string category)
+        public async Task<IActionResult> Manage(string category)
         {
             var viewModel = new AdminManageViewModel
             {
                 Category = category
             };
 
+
             if (category == "Podcasts")
-                viewModel.Podcasts = _context.Podcasts.ToList();
+                viewModel.Podcasts = await _adminService.GetPodcastsAsync();
             else
-                viewModel.Films = _context.Films.Where(f => f.Category == category).ToList();
+                viewModel.Films = await _adminService.GetFilmsAsync();
 
             return View("Manage", viewModel);
         }
@@ -75,9 +79,13 @@ namespace HopelessFilmiesMVC.Controllers
             ViewBag.Category = category;
 
             if (category == "Podcasts")
-                return View("FilmForm", new Podcast { });
+            {
+                var podcast = _adminService.PrepareNewPodcast();
+                return View("FilmForm", podcast);
+            }
 
-            return View("FilmForm", new Film { Category = category });
+            var film = _adminService.PrepareNewFilm(category);
+            return View("FilmForm", film);
         }
 
         [HttpGet]
@@ -87,113 +95,36 @@ namespace HopelessFilmiesMVC.Controllers
 
             if (category == "Podcasts")
             {
-                var podcast = _context.Podcasts.FirstOrDefault(p => p.Id == id);
+                var podcast = _adminService.GetPodcastsAsync(id);
                 if (podcast == null) return NotFound();
                 return View("FilmForm", podcast);
             }
             else
             {
-                var film = _context.Films.FirstOrDefault(f => f.Id == id);
+                var film = _adminService.GetFilmsAsync(id);
                 if (film == null) return NotFound();
                 return View("FilmForm", film);
             }
         }
 
         [HttpPost]
-        public IActionResult SaveMedia(IFormCollection form)
+        public async Task<IActionResult> SaveMedia(IFormCollection form)
         {
             try
             {
                 string category = form["Category"];
+                (bool success, string message) result;
 
                 if (category == "Podcasts")
                 {
-                    var id = string.IsNullOrEmpty(form["Id"]) ? 0 : int.Parse(form["Id"]);
-                    var heading = form["Heading"]; // Use Heading for consistency with Film model and form
-                    var image = form["Image"];
-                    var language = form["Language"];
-                    var year = int.TryParse(form["Year"], out int y) ? y : 0;
-                    var description = form["Description"];
-                    var host = form["Host"];
-                    var guest = form["GuestsString"]; // Use GuestsString for consistency with form
-                    var duration = form["Duration"];
-                    var link = form["Link"];
-                    var genre = form["GenreString"];
-
-                    Podcast podcast;
-
-                    if (id == 0)
-                    {
-                        podcast = new Podcast();
-                        _context.Podcasts.Add(podcast);
-                    }
-                    else
-                    {
-                        podcast = _context.Podcasts.FirstOrDefault(p => p.Id == id);
-                        if (podcast == null)
-                        {
-                            return Json(new { success = false, message = "Podcast not found." });
-                        }
-                    }
-
-                    podcast.Heading = heading; // Use heading
-                    podcast.Image = image;
-                    podcast.Language = language;
-                    podcast.Year = year;
-                    podcast.Description = description;
-                    podcast.Host = host;
-                    podcast.GuestsString = guest;
-                    podcast.Duration = duration;
-                    podcast.Link = link;
-                    podcast.GenreString = genre;
+                    result = await _adminService.SavePodcastAsync(form);
                 }
-                else // Film (ShortFilm, Movie, Exclusive)
+                else
                 {
-                    var id = string.IsNullOrEmpty(form["Id"]) ? 0 : int.Parse(form["Id"]);
-                    var heading = form["Heading"];
-                    var image = form["Image"];
-                    var language = form["Language"];
-                    var year = int.TryParse(form["Year"], out int y) ? y : 0;
-                    var description = form["Description"];
-                    var link = form["Link"];
-                    var genre = form["Genre"];
-                    var writer = form["Writer"];
-                    var director = form["Director"];
-                    var stars = form["StarsString"];
-
-                    Film film;
-
-                    if (id == 0)
-                    {
-                        film = new Film();
-                        _context.Films.Add(film);
-                    }
-                    else
-                    {
-                        film = _context.Films.FirstOrDefault(f => f.Id == id);
-                        if (film == null)
-                        {
-                            return Json(new { success = false, message = "Film not found." });
-                        }
-                    }
-
-                    film.Heading = heading;
-                    film.Image = image;
-                    film.Language = language;
-                    film.Year = year;
-                    film.Description = description;
-                    film.Link = link;
-                    film.GenreString = genre; // Ensure this matches your Film model's property name
-                    film.Writer = writer;
-                    film.Director = director;
-                    film.StarsString = stars;
-                    film.Category = category; // Ensure Category is set for films
+                    result = await  _adminService.SaveFilmAsync(form);
                 }
 
-                _context.SaveChanges(); // Save changes outside the if/else to catch all DB updates
-
-                // Return a JSON response with success: true
-                return Json(new { success = true, message = "Item saved successfully!" });
+                return Json(new { success = result.success, message = result.message });
             }
             catch (DbUpdateException dbEx)
             {
@@ -211,26 +142,26 @@ namespace HopelessFilmiesMVC.Controllers
 
 
         [HttpPost]
-        public IActionResult DeleteMedia(int id, string category)
+        public async Task<IActionResult> DeleteMedia(int id, string category)
         {
             try
             {
                 if (category == "Podcasts")
                 {
-                    var podcast = _context.Podcasts.FirstOrDefault(p => p.Id == id);
+                    var podcast = await  _adminService.GetPodcastsAsync(id);
                     if (podcast != null)
                     {
-                        _context.Podcasts.Remove(podcast);
-                        _context.SaveChanges();
+                        _adminService.RemovePodcastAsync(podcast);
+                        _adminService.SaveChangesAsync();
                     }
                 }
                 else
                 {
-                    var film = _context.Films.FirstOrDefault(f => f.Id == id);
+                    var film = await _adminService.GetFilmsAsync(id);
                     if (film != null)
                     {
-                        _context.Films.Remove(film);
-                        _context.SaveChanges();
+                        _adminService.RemoveFilmAsync(film);
+                        _adminService.SaveChangesAsync();
                     }
                 }
 

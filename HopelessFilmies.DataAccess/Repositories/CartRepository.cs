@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HopelessFilmies.DataAccess
+namespace HopelessFilmies.DataAccess.Repositories
 {
     public class CartRepository : ICartRepository
     {
@@ -23,5 +23,16 @@ namespace HopelessFilmies.DataAccess
            var cartItems = await _userDbContext.Films.Where(f => ids.Contains(f.Id) && f.Category == "Exclusive").ToListAsync();
             return cartItems;
         }
+
+        public async Task<User?> GetUserByEmailAsync(string email)
+        {
+            return await _userDbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _userDbContext.SaveChangesAsync();
+        }
+
     }
 }

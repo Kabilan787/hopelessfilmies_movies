@@ -1,4 +1,4 @@
-using HopelessFilmiesMVC.Data;
+using HopelessFilmies.Domain.Interfaces.IHome;
 using HopelessFilmiesMVC.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -8,22 +8,22 @@ namespace HopelessFilmiesMVC.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly UserDbContext _context;
+        private readonly IHomeService _homeService;
 
-        public HomeController(ILogger<HomeController> logger, UserDbContext context)
+        public HomeController(ILogger<HomeController> logger, IHomeService homeService)
         {
             _logger = logger;
-            _context = context;
+            _homeService = homeService;
         }
 
 
 
-        public IActionResult Index()
+        public async Task<IActionResult> IndexAsync()
         {
-            var shortfilms = _context.Films.Where(f => f.Category == "Shortfilm").ToList();
-            var movies = _context.Films.Where(f => f.Category == "Movie").ToList();
-            var podcasts = _context.Podcasts.ToList();
-            var exclusive = _context.Films.Where(f => f.Category == "Exclusive").ToList();
+            var shortfilms = await _homeService.GetFilmsByCategoryAsync("Shortfilm");
+            var movies = await _homeService.GetFilmsByCategoryAsync("Movie");
+            var exclusive = await _homeService.GetFilmsByCategoryAsync("Exclusive");
+            var podcasts = await _homeService.GetAllPodcastsAsync();
 
             var model = new HomeViewModel
             {
@@ -37,7 +37,8 @@ namespace HopelessFilmiesMVC.Controllers
         }
 
 
-        public IActionResult AllMedia(string type, string query)
+        [HttpGet]
+        public async Task<IActionResult> AllMedia(string type, string query)
         {
             if (string.IsNullOrEmpty(type))
                 return NotFound();
@@ -48,106 +49,37 @@ namespace HopelessFilmiesMVC.Controllers
             if (type.Equals("shortfilms", StringComparison.OrdinalIgnoreCase) || type.Equals("movies", StringComparison.OrdinalIgnoreCase))
             {
                 var category = type.Equals("shortfilms", StringComparison.OrdinalIgnoreCase) ? "Shortfilm" : "Movie";
-                var items = _context.Films
-                    .Where(f => f.Category == category)
-                    .AsEnumerable();
-
-                if (!string.IsNullOrEmpty(query))
-                {
-                    string q = query.ToLower();
-                    items = items.AsParallel().Where(f =>
-                        (!string.IsNullOrEmpty(f.Heading) && f.Heading.ToLower().Contains(q)) ||
-                        (!string.IsNullOrEmpty(f.Description) && f.Description.ToLower().Contains(q)) ||
-                        (!string.IsNullOrEmpty(f.Language) && f.Language.ToLower().Contains(q)) ||
-                        f.Year.ToString().Contains(q) ||
-                        f.Genre.Any(g => g.ToLower().Contains(q)) ||
-                        (!string.IsNullOrEmpty(f.Writer) && f.Writer.ToLower().Contains(q)) ||
-                        (!string.IsNullOrEmpty(f.Director) && f.Director.ToLower().Contains(q)) ||
-                        f.Stars.Any(s => s.ToLower().Contains(q))
-                    );
-                }
-
-                return View(items.ToList());
+                var films = await _homeService.GetFilteredFilmsAsync(category, query);
+                return View(films);
             }
             else if (type.Equals("podcasts", StringComparison.OrdinalIgnoreCase))
             {
-                var items = _context.Podcasts.AsEnumerable();
-
-                if (!string.IsNullOrEmpty(query))
-                {
-                    string q = query.ToLower();
-                    items = items.AsParallel().Where(p =>
-                        (!string.IsNullOrEmpty(p.Heading) && p.Heading.ToLower().Contains(q)) ||
-                        (!string.IsNullOrEmpty(p.Description) && p.Description.ToLower().Contains(q)) ||
-                        (!string.IsNullOrEmpty(p.Host) && p.Host.ToLower().Contains(q)) ||
-                        (!string.IsNullOrEmpty(p.Language) && p.Language.ToLower().Contains(q)) ||
-                        p.Year.ToString().Contains(q) ||
-                        (!string.IsNullOrEmpty(p.Duration) && p.Duration.ToLower().Contains(q)) ||
-                        p.Guests.Any(g => g.ToLower().Contains(q)) ||
-                        p.Genre.Any(t => t.ToLower().Contains(q))
-                    );
-                }
-
-                return View(items.ToList());
+                var podcasts = await _homeService.GetFilteredPodcastsAsync(query);
+                return View(podcasts);
             }
             else if (type.Equals("exclusive", StringComparison.OrdinalIgnoreCase))
             {
-                var items = _context.Films
-                    .Where(f => f.Category == "Exclusive")
-                    .AsEnumerable();
-
-                if (!string.IsNullOrEmpty(query))
-                {
-                    string q = query.ToLower();
-                    items = items.AsParallel().Where(f =>
-                        (!string.IsNullOrEmpty(f.Heading) && f.Heading.ToLower().Contains(q)) ||
-                        (!string.IsNullOrEmpty(f.Description) && f.Description.ToLower().Contains(q)) ||
-                        (!string.IsNullOrEmpty(f.Language) && f.Language.ToLower().Contains(q)) ||
-                        f.Year.ToString().Contains(q) ||
-                        f.Genre.Any(g => g.ToLower().Contains(q)) ||
-                        (!string.IsNullOrEmpty(f.Writer) && f.Writer.ToLower().Contains(q)) ||
-                        (!string.IsNullOrEmpty(f.Director) && f.Director.ToLower().Contains(q)) ||
-                        f.Stars.Any(s => s.ToLower().Contains(q))
-                    );
-                }
-
-                return View(items.ToList());
+                var films = await _homeService.GetFilteredFilmsAsync("Exclusive", query);
+                return View(films);
             }
-
 
             return NotFound();
         }
 
 
 
-        public IActionResult Details(int id, string type)
+        [HttpGet]
+        public async Task<IActionResult> Details(int id, string type)
         {
-            object selectedMedia = null;
-
-            switch (type?.ToLower())
-            {
-                case "shortfilms":  // to support both
-                    selectedMedia = _context.Films.FirstOrDefault(f => f.Id == id && f.Category.ToLower() == "shortfilm");
-                    break;
-             
-                case "movies":
-                    selectedMedia = _context.Films.FirstOrDefault(m => m.Id == id && m.Category.ToLower() == "movie");
-                    break;
-
-                case "podcasts":
-                    selectedMedia = _context.Podcasts.FirstOrDefault(p => p.Id == id);
-                    break;
-            }
+            var selectedMedia = await _homeService.GetMediaDetailsAsync(id, type);
 
             if (selectedMedia == null)
-            {
                 return NotFound();
-            }
 
             ViewData["MediaType"] = type?.ToLower();
             return View("Details", selectedMedia);
         }
-    
+
 
         public IActionResult Privacy()
         {

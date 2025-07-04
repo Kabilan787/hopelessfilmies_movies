@@ -1,4 +1,4 @@
-﻿using HopelessFilmiesMVC.Data;
+﻿using HopelessFilmies.Domain.Models;
 
 namespace HopelessFilmiesMVC.Models
 {

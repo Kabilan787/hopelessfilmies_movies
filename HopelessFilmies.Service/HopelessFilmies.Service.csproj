@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\HopelessFilmies.Domain\HopelessFilmies.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

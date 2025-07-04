@@ -10,5 +10,9 @@ namespace HopelessFilmies.Domain.Interfaces.ICart
     public interface ICartService
     {
         Task<List<Film>> GetCartAsync(List<int> ids);
+
+        Task<User?> GetUserByEmailAsync(string email);
+
+        Task SaveChangesAsync();
     }
 }

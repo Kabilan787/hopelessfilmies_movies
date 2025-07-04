@@ -80,7 +80,7 @@ namespace HopelessFilmiesMVC.Controllers
 
         [HttpPost]
         [HttpPost("checkout")]
-        public IActionResult Checkout()
+        public async Task<IActionResult> Checkout()
         {
             if (!User.Identity.IsAuthenticated)
             {
@@ -99,7 +99,7 @@ namespace HopelessFilmiesMVC.Controllers
                 }
 
                 var userEmail = emailClaim.Value;
-                var user = _context.Users.FirstOrDefault(u => u.Email == userEmail);
+                var user = await _cartService.GetUserByEmailAsync(userEmail);
 
                 if (user == null)
                 {
@@ -107,7 +107,7 @@ namespace HopelessFilmiesMVC.Controllers
                 }
 
                 var cartIds = GetCartIds();
-                var films = _context.Films.Where(f => cartIds.Contains(f.Id)).ToList();
+                var films = await _cartService.GetCartAsync(cartIds);
 
                 if (!films.Any())
                 {
@@ -122,7 +122,7 @@ namespace HopelessFilmiesMVC.Controllers
                 existing.AddRange(movieNames.Where(m => !existing.Contains(m)));
                 user.PurchasedMovies = string.Join(", ", existing.Distinct());
 
-                _context.SaveChanges();
+                await _cartService.SaveChangesAsync();
                 HttpContext.Session.Remove("Cart");
 
                 return Json(new { success = true, message = "Payment Successful, Movies Added to your List." });
