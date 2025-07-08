@@ -22,7 +22,7 @@ public class ContactController : Controller
 
     // POST: /Contact
     [HttpPost]
-    public IActionResult Submit(string name, string email, string message)
+    public async Task<IActionResult> Submit(string name, string email, string message)
     {
         if (!string.IsNullOrWhiteSpace(name) && !string.IsNullOrWhiteSpace(email) && !string.IsNullOrWhiteSpace(message))
         {
@@ -36,12 +36,12 @@ public class ContactController : Controller
             //_context.ContactForms.Add(contact);
             //_context.SaveChanges();
 
-            _contactService.AddContactAsync(name, email, message);
+            await _contactService.AddContactAsync(name, email, message);
 
             return Ok(); // Respond with 200 OK for success
         }
 
-        return BadRequest(); // Respond with 400 Bad Request for failure
+        return BadRequest("Invalid input"); // Respond with 400 Bad Request for failure
     }
 
 

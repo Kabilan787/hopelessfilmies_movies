@@ -24,15 +24,20 @@ namespace HopelessFilmies.Domain.Interfaces.IAdmin
 
         Podcast PrepareNewPodcast();
 
-        Task<(bool success, string message)> SaveFilmAsync(IFormCollection form);
+        Task<(bool, string)> SaveFilmAsync(IFormCollection form, string imagePath);
 
-        Task<(bool, string)> SavePodcastAsync(IFormCollection form);
+        Task<(bool, string)> SavePodcastAsync(IFormCollection form, string imagePath);
 
         Task SaveChangesAsync();
 
         Task RemoveFilmAsync(Film film);
 
         Task RemovePodcastAsync(Podcast podcast);
-        
+
+        Task<List<User>> GetUsersAsync();
+
+        Task<List<ContactForm>> GetContactFormsAsync();
+
+        Task<bool> DeleteContactFormAsync(int id);
     }
 }

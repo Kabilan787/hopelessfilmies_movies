@@ -1,7 +1,9 @@
 using HopelessFilmies.Domain.Interfaces.IHome;
 using HopelessFilmiesMVC.Models;
+using HopelessFilmies.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace HopelessFilmiesMVC.Controllers
 {
@@ -71,13 +73,55 @@ namespace HopelessFilmiesMVC.Controllers
         [HttpGet]
         public async Task<IActionResult> Details(int id, string type)
         {
-            var selectedMedia = await _homeService.GetMediaDetailsAsync(id, type);
+            var media = await _homeService.GetMediaDetailsAsync(id, type);
+            if (media == null) return NotFound();
 
-            if (selectedMedia == null)
-                return NotFound();
+            bool isUserSignedIn = User.Identity.IsAuthenticated;
+            string userEmail = isUserSignedIn
+                ? User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value
+                : null;
 
-            ViewData["MediaType"] = type?.ToLower();
-            return View("Details", selectedMedia);
+            string heading = null;
+            string category = null;
+            string link = null;
+
+            string buttonLabel = (media is Podcast) ? "Listen Now" : "Watch Now";
+
+            if (media is Film film)
+            {
+                heading = film.Heading;
+                category = film.Category;
+                link = film.Link;
+            }
+            else if (media is Podcast podcast)
+            {
+                heading = podcast.Heading;
+                
+                link = podcast.Link;
+            }
+
+            bool isExclusive = category?.Equals("Exclusive", StringComparison.OrdinalIgnoreCase) == true;
+            bool isPurchased = false;
+
+            if (isExclusive && isUserSignedIn && !string.IsNullOrEmpty(userEmail))
+            {
+                var user = await _homeService.GetUserByEmailAsync(userEmail);
+                if (user != null && !string.IsNullOrEmpty(user.PurchasedMovies))
+                {
+                    isPurchased = user.PurchasedMovies
+                        .Split(',')
+                        .Any(title => title.Trim().Equals(heading.Trim(), StringComparison.OrdinalIgnoreCase));
+                }
+            }
+
+            // Pass required values to view via ViewBag
+            ViewBag.IsUserSignedIn = isUserSignedIn;
+            ViewBag.IsExclusive = isExclusive;
+            ViewBag.IsPurchased = isPurchased;
+            ViewBag.ButtonLabel = buttonLabel;
+            ViewBag.Link = link;
+
+            return View("Details", media);
         }
 
 

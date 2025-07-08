@@ -41,5 +41,11 @@ namespace HopelessFilmies.DataAccess.Repositories
         {
             return await _userDbContext.Podcasts.FirstOrDefaultAsync(p => p.Id == id);
         }
+
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            return await _userDbContext.Users
+                .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+        }
     }
 }

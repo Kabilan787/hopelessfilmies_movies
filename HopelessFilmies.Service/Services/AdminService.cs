@@ -53,7 +53,7 @@ namespace HopelessFilmies.Service.Services
             return new Podcast(); // you can add defaults if needed
         }
 
-        public async Task<(bool, string)> SaveFilmAsync(IFormCollection form)
+        public async Task<(bool, string)> SaveFilmAsync(IFormCollection form, string imagePath)
         {
             var id = string.IsNullOrEmpty(form["Id"]) ? 0 : int.Parse(form["Id"]);
             var film = id == 0 ? new Film() : await _adminRepository.GetFilmsAsync(id);
@@ -62,7 +62,6 @@ namespace HopelessFilmies.Service.Services
                 return (false, "Film not found.");
 
             film.Heading = form["Heading"];
-            film.Image = form["Image"];
             film.Language = form["Language"];
             film.Year = int.TryParse(form["Year"], out var y) ? y : 0;
             film.Description = form["Description"];
@@ -73,6 +72,9 @@ namespace HopelessFilmies.Service.Services
             film.StarsString = form["StarsString"];
             film.Category = form["Category"];
 
+            if (!string.IsNullOrEmpty(imagePath))
+                film.Image = imagePath;
+
             if (id == 0)
                 await _adminRepository.AddFilmAsync(film);
 
@@ -80,7 +82,7 @@ namespace HopelessFilmies.Service.Services
             return (true, "Film saved successfully.");
         }
 
-        public async Task<(bool, string)> SavePodcastAsync(IFormCollection form)
+        public async Task<(bool, string)> SavePodcastAsync(IFormCollection form, string imagePath)
         {
             var id = string.IsNullOrEmpty(form["Id"]) ? 0 : int.Parse(form["Id"]);
             var podcast = id == 0 ? new Podcast() : await _adminRepository.GetPodcastsAsync(id);
@@ -89,7 +91,6 @@ namespace HopelessFilmies.Service.Services
                 return (false, "Podcast not found.");
 
             podcast.Heading = form["Heading"];
-            podcast.Image = form["Image"];
             podcast.Language = form["Language"];
             podcast.Year = int.TryParse(form["Year"], out var y) ? y : 0;
             podcast.Description = form["Description"];
@@ -98,6 +99,9 @@ namespace HopelessFilmies.Service.Services
             podcast.Duration = form["Duration"];
             podcast.Link = form["Link"];
             podcast.GenreString = form["GenreString"];
+
+            if (!string.IsNullOrEmpty(imagePath))
+                podcast.Image = imagePath;
 
             if (id == 0)
                 await _adminRepository.AddPodcastAsync(podcast);
@@ -119,6 +123,21 @@ namespace HopelessFilmies.Service.Services
         public async Task RemovePodcastAsync(Podcast podcast)
         {
            await  _adminRepository.RemovePodcastAsync(podcast);
+        }
+
+        public async Task<List<User>> GetUsersAsync()
+        {
+            return await _adminRepository.GetUsersAsync();
+        }
+
+        public async Task<List<ContactForm>> GetContactFormsAsync()
+        {
+            return await _adminRepository.GetContactFormsAsync();
+        }
+
+        public async Task<bool> DeleteContactFormAsync(int id)
+        {
+            return await _adminRepository.DeleteContactFormAsync(id);
         }
     }
 }

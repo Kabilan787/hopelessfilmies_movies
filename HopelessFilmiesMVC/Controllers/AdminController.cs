@@ -2,6 +2,7 @@
 using HopelessFilmies.Domain.Interfaces.ICart;
 using HopelessFilmiesMVC.Data;
 using HopelessFilmiesMVC.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
@@ -12,9 +13,12 @@ namespace HopelessFilmiesMVC.Controllers
     {
         private readonly IAdminService _adminService;
 
-        public AdminController(IAdminService adminService)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        public AdminController(IAdminService adminService, IWebHostEnvironment webHostEnvironment)
         {
             _adminService = adminService;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: /Admin/Login
@@ -89,23 +93,25 @@ namespace HopelessFilmiesMVC.Controllers
         }
 
         [HttpGet]
-        public IActionResult EditMedia(int id, string category)
+        public async Task<IActionResult> EditMedia(int id, string category)
         {
             ViewBag.Category = category;
 
             if (category == "Podcasts")
             {
-                var podcast = _adminService.GetPodcastsAsync(id);
+                var podcast = await _adminService.GetPodcastsAsync(id);
                 if (podcast == null) return NotFound();
                 return View("FilmForm", podcast);
             }
             else
             {
-                var film = _adminService.GetFilmsAsync(id);
+                var film = await _adminService.GetFilmsAsync(id);
                 if (film == null) return NotFound();
                 return View("FilmForm", film);
             }
         }
+
+        
 
         [HttpPost]
         public async Task<IActionResult> SaveMedia(IFormCollection form)
@@ -115,30 +121,49 @@ namespace HopelessFilmiesMVC.Controllers
                 string category = form["Category"];
                 (bool success, string message) result;
 
+                // Handle uploaded image
+                var file = Request.Form.Files["ImageFile"];
+                string imagePath = null;
+
+                if (file != null && file.Length > 0)
+                {
+                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+                    Directory.CreateDirectory(uploadsFolder); // Ensure folder exists
+
+                    var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    imagePath = "/uploads/" + uniqueFileName;
+                }
+
                 if (category == "Podcasts")
                 {
-                    result = await _adminService.SavePodcastAsync(form);
+                    result = await _adminService.SavePodcastAsync(form, imagePath);
                 }
                 else
                 {
-                    result = await  _adminService.SaveFilmAsync(form);
+                    result = await _adminService.SaveFilmAsync(form, imagePath);
                 }
 
                 return Json(new { success = result.success, message = result.message });
             }
             catch (DbUpdateException dbEx)
             {
-                // Log the inner exception for more details
                 Console.WriteLine("DbUpdateException: " + dbEx.InnerException?.Message);
                 return Json(new { success = false, message = $"Database error: {dbEx.InnerException?.Message ?? dbEx.Message}" });
             }
             catch (Exception ex)
             {
-                // Catch any other unexpected errors
                 Console.WriteLine("General Exception: " + ex.Message);
                 return Json(new { success = false, message = $"An unexpected error occurred: {ex.Message}" });
             }
         }
+
 
 
         [HttpPost]
@@ -151,8 +176,7 @@ namespace HopelessFilmiesMVC.Controllers
                     var podcast = await  _adminService.GetPodcastsAsync(id);
                     if (podcast != null)
                     {
-                        _adminService.RemovePodcastAsync(podcast);
-                        _adminService.SaveChangesAsync();
+                        await _adminService.RemovePodcastAsync(podcast);
                     }
                 }
                 else
@@ -160,8 +184,7 @@ namespace HopelessFilmiesMVC.Controllers
                     var film = await _adminService.GetFilmsAsync(id);
                     if (film != null)
                     {
-                        _adminService.RemoveFilmAsync(film);
-                        _adminService.SaveChangesAsync();
+                        await _adminService.RemoveFilmAsync(film);
                     }
                 }
 
@@ -171,6 +194,54 @@ namespace HopelessFilmiesMVC.Controllers
             {
                 return Json(new { success = false, error = ex.Message });
             }
+        }
+
+        public async Task<IActionResult> UsersDetails()
+        {
+            if (HttpContext.Session.GetString("IsAdmin") != "true")
+            {
+                return RedirectToAction("Login", new { message = "Please log in as admin." });
+            }
+
+            var users = await _adminService.GetUsersAsync();
+            return View(users);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewContactForms()
+        {
+            if (HttpContext.Session.GetString("IsAdmin") != "true")
+            {
+                return RedirectToAction("Login", new { message = "Please log in as admin." });
+            }
+
+            var contacts = await _adminService.GetContactFormsAsync();
+            return View(contacts);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteContact(int id)
+        {
+            try
+            {
+                var success = await _adminService.DeleteContactFormAsync(id);
+
+                if (success)
+                    return Json(new { success = true });
+                else
+                    return Json(new { success = false, message = "Could not delete contact. Contact not found." });
+            }
+            catch (Exception ex)
+            {
+                // Optional: log ex
+                return Json(new { success = false, message = "Server error while deleting contact." });
+            }
+        }
+
+        public IActionResult Logout()
+        {
+            return RedirectToAction("Login");
         }
 
     }

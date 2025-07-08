@@ -14,5 +14,7 @@ namespace HopelessFilmies.Domain.Interfaces.IHome
 
         Task<Film> GetFilmByIdAndCategoryAsync(int id, string category);
         Task<Podcast> GetPodcastByIdAsync(int id);
+
+        Task<User> GetUserByEmailAsync(string email);
     }
 }

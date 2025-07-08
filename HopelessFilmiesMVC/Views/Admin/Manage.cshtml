@@ -1,9 +1,9 @@
 ﻿@model HopelessFilmiesMVC.Models.AdminManageViewModel
-
+@Html.AntiForgeryToken()
 @{
     ViewData["Title"] = $"Manage {Model.Category}";
     var isPodcast = Model.Category == "Podcasts";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <style>
@@ -232,6 +232,7 @@
                 <thead>
                     <tr>
                         <th style="width: 30%;">Title</th>
+                        <th style="width: 20%;">Image</th>
                         <th style="width: 20%;">Language</th>
                         <th style="width: 20%;">Year</th>
                         <th style="width: 30%;">Actions</th>
@@ -242,6 +243,12 @@
                     {
                         <tr>
                             <td>@item.Heading</td>
+                            <td>
+                                <img src="@item.Image"
+                                     alt="Thumbnail"
+                                     style="width: 100px; height: auto; border-radius: 4px;"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/100x60/000000/FFFFFF?text=No+Image';" />
+                            </td>
                             <td>@item.Language</td>
                             <td>@item.Year</td>
                             <td class="action-buttons">
@@ -274,16 +281,23 @@
                 <thead>
                     <tr>
                         <th style="width: 30%;">Title</th>
+                        <th style="width: 20%;">Image</th>
                         <th style="width: 20%;">Language</th>
                         <th style="width: 20%;">Year</th>
                         <th style="width: 30%;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model.Films)
+                    @foreach (var item in Model.Films.Where(f => f.Category.Equals(Model.Category)))
                     {
                         <tr>
                             <td>@item.Heading</td>
+                            <td>
+                                <img src="@item.Image"
+                                     alt="Thumbnail"
+                                     style="width: 100px; height: auto; border-radius: 4px;"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/100x60/000000/FFFFFF?text=No+Image';" />
+                            </td>
                             <td>@item.Language</td>
                             <td>@item.Year</td>
                             <td class="action-buttons">
@@ -336,74 +350,89 @@
 
 @section Scripts {
     <script>
-        // Function to show the custom alert modal
-        function showAlertModal(title, message) {
-            $('#alertModalTitle').text(title);
-            $('#alertModalMessage').text(message);
-            $('#alertModal').addClass('show');
-        }
+        $(document).ready(function () {
 
-        // Function to hide the custom alert modal
-        function hideAlertModal() {
-            $('#alertModal').removeClass('show');
-        }
+            // Show jQuery version (optional check)
+            console.log("jQuery version:", $.fn.jquery);
 
-        // Event listener for closing the alert modal
-        $(document).on("click", "#closeAlertBtn", hideAlertModal);
+            // Function to show the custom alert modal
+            function showAlertModal(title, message) {
+                $('#alertModalTitle').text(title);
+                $('#alertModalMessage').text(message);
+                $('#alertModal').addClass('show');
+            }
 
-        // Variables to store item details for deletion
-        let itemIdToDelete = null;
-        let itemCategoryToDelete = null;
-        let $rowToDelete = null;
+            // Function to hide the custom alert modal
+            function hideAlertModal() {
+                $('#alertModal').removeClass('show');
+            }
 
-        // Event listener for delete button click
-        $(document).on("click", ".delete-button", function () {
-            itemIdToDelete = $(this).data("id");
-            itemCategoryToDelete = $(this).data("category");
-            $rowToDelete = $(this).closest("tr");
+            // Close alert modal button
+            $(document).on("click", "#closeAlertBtn", hideAlertModal);
 
-            // Show the custom confirmation modal
-            $('#deleteConfirmationModal').addClass('show');
-        });
+            // Variables to track item info
+            let itemIdToDelete = null;
+            let itemCategoryToDelete = null;
+            let $rowToDelete = null;
 
-        // Event listener for confirm delete button in modal
-        $(document).on("click", "#confirmDeleteBtn", function () {
-            $('#deleteConfirmationModal').removeClass('show'); // Hide modal immediately
+            // When trash icon is clicked
+            $(document).on("click", ".delete-button", function () {
+                itemIdToDelete = $(this).data("id");
+                itemCategoryToDelete = $(this).data("category");
+                $rowToDelete = $(this).closest("tr");
 
-            $.ajax({
-                url: '/Admin/DeleteMedia',
-                method: 'POST',
-                data: {
-                    id: itemIdToDelete,
-                    category: itemCategoryToDelete
-                },
-                success: function (res) {
-                    if (res.success) {
-                        $rowToDelete.fadeOut(300, function () {
-                            $(this).remove();
-                            // Reset variables
-                            itemIdToDelete = null;
-                            itemCategoryToDelete = null;
-                            $rowToDelete = null;
-                        });
-                    } else {
-                        showAlertModal("Deletion Failed", res.message || "Failed to delete item.");
-                    }
-                },
-                error: function (xhr, status, error) {
-                    showAlertModal("Error", "An error occurred while deleting the item. Please try again.");
-                    console.error("AJAX Error: ", status, error, xhr.responseText);
-                }
+                $('#deleteConfirmationModal').addClass('show');
             });
-        });
 
-        // Event listener for cancel delete button in modal
-        $(document).on("click", "#cancelDeleteBtn", function () {
-            $('#deleteConfirmationModal').removeClass('show');
-            // Reset variables
-            itemIdToDelete = null;
-            itemCategoryToDelete = null;
-            $rowToDelete = null;
+            // Confirm delete button click
+            $(document).on("click", "#confirmDeleteBtn", function () {
+                $('#deleteConfirmationModal').removeClass('show');
+
+                if (!itemIdToDelete || !$rowToDelete) {
+                    showAlertModal("Error", "Missing item information. Please try again.");
+                    return;
+                }
+
+                $.ajax({
+                    url: '/Admin/DeleteMedia',
+                    method: 'POST',
+                    data: {
+                        id: itemIdToDelete,
+                        category: itemCategoryToDelete
+                    },
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val() || ''
+                    },
+                    success: function (res) {
+                        if (res.success) {
+                            $rowToDelete.fadeOut(300, function () {
+                                $(this).remove();
+                            });
+                        } else {
+                            showAlertModal("Deletion Failed", res.message || "Failed to delete item.");
+                        }
+
+                        // Reset variables
+                        itemIdToDelete = null;
+                        itemCategoryToDelete = null;
+                        $rowToDelete = null;
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("AJAX Error:", status, error, xhr.responseText);
+                        showAlertModal("Error", "An error occurred while deleting the item.");
+                    }
+                });
+            });
+
+            // Cancel button in modal
+            $(document).on("click", "#cancelDeleteBtn", function () {
+                $('#deleteConfirmationModal').removeClass('show');
+                itemIdToDelete = null;
+                itemCategoryToDelete = null;
+                $rowToDelete = null;
+            });
+
         });
     </script>
 }
+

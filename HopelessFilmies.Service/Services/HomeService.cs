@@ -26,7 +26,7 @@ namespace HopelessFilmies.Service.Services
             return _homeRepository.GetAllPodcastsAsync();
         }
 
-        public async Task<List<Film>> GetFilteredFilmsAsync(string category, string query)
+        public async Task<List<Film>>   GetFilteredFilmsAsync(string category, string query)
         {
             var films = await _homeRepository.GetFilmsByCategoryAsync(category);
 
@@ -79,12 +79,20 @@ namespace HopelessFilmies.Service.Services
                 case "movies":
                     return await _homeRepository.GetFilmByIdAndCategoryAsync(id, "Movie");
 
+                case "exclusive":
+                    return await _homeRepository.GetFilmByIdAndCategoryAsync(id, "Exclusive");
+
                 case "podcasts":
                     return await _homeRepository.GetPodcastByIdAsync(id);
 
                 default:
                     return null;
             }
+        }
+
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            return await _homeRepository.GetUserByEmailAsync(email);
         }
     }
 }

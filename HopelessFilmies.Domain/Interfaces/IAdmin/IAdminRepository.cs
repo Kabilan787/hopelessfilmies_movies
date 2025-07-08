@@ -27,5 +27,12 @@ namespace HopelessFilmies.Domain.Interfaces.IAdmin
         Task RemoveFilmAsync(Film film);
 
         Task RemovePodcastAsync(Podcast podcast);
+
+        Task<List<User>> GetUsersAsync();
+
+        Task<List<ContactForm>> GetContactFormsAsync();
+
+        Task<bool> DeleteContactFormAsync(int id);
+
     }
 }

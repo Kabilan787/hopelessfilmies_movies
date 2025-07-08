@@ -28,7 +28,7 @@ namespace HopelessFilmies.DataAccess.Repositories
 
         public async Task<Podcast> GetPodcastsAsync(int id)
         {
-            return  _userDbContext.Podcasts.FirstOrDefault(p => p.Id == id);
+            return await _userDbContext.Podcasts.FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<Film> GetFilmsAsync(int id)
@@ -65,11 +65,36 @@ namespace HopelessFilmies.DataAccess.Repositories
         public async Task RemoveFilmAsync(Film film)
         {
             _userDbContext.Films.Remove(film);
+            await _userDbContext.SaveChangesAsync();
         }
 
         public async Task RemovePodcastAsync(Podcast podcast)
         {
             _userDbContext.Podcasts.Remove(podcast);
+            await _userDbContext.SaveChangesAsync();
+        }
+
+        public async Task<List<User>> GetUsersAsync()
+        {
+            return await _userDbContext.Users.ToListAsync();
+        }
+
+        public async Task<List<ContactForm>> GetContactFormsAsync()
+        {
+            return await _userDbContext.ContactForms.ToListAsync();
+        }
+
+        public async Task<bool> DeleteContactFormAsync(int id)
+        {
+            var contact = await _userDbContext.ContactForms.FindAsync(id);
+
+            if (contact == null)
+                return false;
+
+            _userDbContext.ContactForms.Remove(contact);
+
+            var rowsAffected = await _userDbContext.SaveChangesAsync();
+            return rowsAffected > 0;
         }
     }
 }

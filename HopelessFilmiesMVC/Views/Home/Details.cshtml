@@ -2,7 +2,7 @@
     ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-@using HopelessFilmiesMVC.Data
+@using HopelessFilmies.Domain.Models
 @model dynamic
 
 <link rel="stylesheet" href="~/css/details.css" asp-append-version="true" />
@@ -20,7 +20,7 @@
         <p><strong>Year:</strong> @Model.Year</p>
         <p><strong>Genre:</strong> @string.Join(", ", Model.Genre)</p>
 
-        @* Optional fields with type check *@
+        @* Film-specific *@
         @if (Model is Film film)
         {
             if (!string.IsNullOrWhiteSpace(film.Writer))
@@ -31,40 +31,59 @@
             {
                 <p><strong>Director:</strong> @film.Director</p>
             }
-            if (film.Stars != null && film.Stars.Any())
+            if (film.Stars?.Any() == true)
             {
                 <p><strong>Stars:</strong> @string.Join(", ", film.Stars)</p>
             }
         }
+
+        @* Podcast-specific *@
         else if (Model is Podcast podcast)
         {
             if (!string.IsNullOrWhiteSpace(podcast.Host))
             {
                 <p><strong>Host:</strong> @podcast.Host</p>
             }
-            if (podcast.Guests != null && podcast.Guests.Any())
+            if (podcast.Guests?.Any() == true)
             {
                 <p><strong>Guests:</strong> @string.Join(", ", podcast.Guests)</p>
             }
         }
 
-        @{
-            string buttonLabel = Model is Podcast ? "Listen Now" : "Watch Now";
-            bool isUserSignedIn = User.Identity.IsAuthenticated;
-            var link = Model.Link;
+        @* Access ViewBag values *@
+        @if (ViewBag.IsExclusive == true)
+        {
+            if (ViewBag.IsUserSignedIn != true)
+            {
+                <p class="text-danger fw-bold">Please sign in to watch this exclusive movie.</p>
+            }
+            else if (ViewBag.IsPurchased != true)
+            {
+                <p class="text-warning fw-bold">Buy this movie to watch it.</p>
+            }
+            else
+            {
+                <a class="btn btn-primary protected-media-link"
+                   href="@ViewBag.Link"
+                   data-link="@ViewBag.Link"
+                   data-signed-in="true"
+                   target="_blank">
+                    @ViewBag.ButtonLabel
+                </a>
+            }
         }
-
-        <a class="btn btn-primary protected-media-link"
-           href="@link"
-           data-link="@link"
-           data-signed-in="@isUserSignedIn.ToString().ToLower()"
-           target="_blank">
-            @buttonLabel
-        </a>
-
+        else
+        {
+            <a class="btn btn-primary protected-media-link"
+               href="@ViewBag.Link"
+               data-link="@ViewBag.Link"
+               data-signed-in="@(ViewBag.IsUserSignedIn.ToString().ToLower())"
+               target="_blank">
+                @ViewBag.ButtonLabel
+            </a>
+        }
 
         <br />
         <a class="btn btn-secondary mt-3" href="/">← Back to Home</a>
     </div>
-
 </section>

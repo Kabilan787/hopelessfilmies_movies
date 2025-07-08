@@ -15,5 +15,7 @@ namespace HopelessFilmies.Domain.Interfaces.IHome
         Task<List<Podcast>> GetFilteredPodcastsAsync(string query);
 
         Task<object> GetMediaDetailsAsync(int id, string type);
+
+        Task<User> GetUserByEmailAsync(string email);
     }
 }

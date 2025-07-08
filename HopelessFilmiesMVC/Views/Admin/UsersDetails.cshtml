@@ -1,0 +1,98 @@
+﻿@model List<HopelessFilmies.Domain.Models.User>
+
+@{
+    ViewData["Title"] = "All User Details";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-white"
+    style="
+        font-family: 'Roboto Slab', serif;
+        color: #f82121; /* Red accent from logo */
+        text-align: center;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+        font-size: 2.5rem;
+        padding-top: 1rem;
+        padding-bottom: 0.5rem;
+    ">
+    All Registered Users
+</h2>
+
+<div style="overflow-x: auto; margin: 0 auto; max-width: 1200px; padding: 0 1rem;">
+    <table class="table table-bordered table-dark table-striped mt-4"
+           style="
+               width: 100%;
+               border-collapse: separate; /* Use separate for border-spacing and border-radius */
+               border-spacing: 0; /* Remove space between cells */
+               border-radius: 12px; /* Rounded corners for the table */
+               overflow: hidden; /* Ensures content is clipped by border-radius */
+               box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6); /* Stronger shadow for depth */
+               background-color: #1a1a1a; /* Ensure dark background */
+               margin-bottom: 3rem !important; /* Add space below the table */
+           ">
+        <thead style="background-color: #E74C3C; color: #ffffff;">
+            <tr>
+                <th style="padding: 1.2rem 1rem; text-align: center; font-size: 1.1rem; border-bottom: 2px solid rgba(0,0,0,0.2); border-top-left-radius: 10px;">#</th>
+                <th style="padding: 1.2rem 1rem; text-align: left; font-size: 1.1rem; border-bottom: 2px solid rgba(0,0,0,0.2);">Name</th>
+                <th style="padding: 1.2rem 1rem; text-align: left; font-size: 1.1rem; border-bottom: 2px solid rgba(0,0,0,0.2);">Email</th>
+                <th style="padding: 1.2rem 1rem; text-align: left; font-size: 1.1rem; border-bottom: 2px solid rgba(0,0,0,0.2); border-top-right-radius: 10px;">Purchased Movies</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                int count = 1;
+                foreach (var user in Model)
+                {
+                    <tr style="transition: background-color 0.3s ease;">
+                        <td style="padding: 1rem; text-align: center; vertical-align: top; border-color: #333;">@count</td>
+                        <td style="padding: 1rem; vertical-align: top; border-color: #333;">@user.FullName</td>
+                        <td style="padding: 1rem; vertical-align: top; border-color: #333;">@user.Email</td>
+                        <td style="padding: 1rem; vertical-align: top; border-color: #333;">
+                            @if (!string.IsNullOrWhiteSpace(user.PurchasedMovies))
+                            {
+                                var movies = user.PurchasedMovies.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                                <ul class="mb-0" style="list-style-type: disc; padding-left: 1.5rem; margin-top: 0;">
+                                    @foreach (var movie in movies)
+                                    {
+                                        <li style="margin-bottom: 0.3rem; color: #f0f0f0;">@movie.Trim()</li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <span class="text-muted" style="color: #999; font-style: italic;">No purchases</span>
+                            }
+                        </td>
+                    </tr>
+                    count++;
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" class="text-center text-muted"
+                        style="
+                                padding: 1.5rem;
+                                color: #aaa;
+                                font-style: italic;
+                                font-size: 1.1rem;
+                                border-color: #333;
+                            ">
+                        No users found.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<style>
+    /* Add a hover effect for table rows (cannot be inline) */
+    .table-dark tbody tr:hover {
+        background-color: #2a2a2a; /* Slightly lighter dark on hover */
+        cursor: pointer;
+    }
+</style>
