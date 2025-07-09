@@ -53,7 +53,7 @@ builder.Services.AddScoped<IHomeService, HomeService>();
 // THIS LINE MUST COME AFTER ALL builder.Services.Add... calls
 var app = builder.Build();
 
-
+// test
 
 // Configure the HTTP request pipeline (middleware)
 if (!app.Environment.IsDevelopment())

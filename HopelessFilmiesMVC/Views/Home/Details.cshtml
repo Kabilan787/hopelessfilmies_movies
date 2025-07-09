@@ -5,35 +5,34 @@
 @using HopelessFilmies.Domain.Models
 @model dynamic
 
-<link rel="stylesheet" href="~/css/details.css" asp-append-version="true" />
+<section class="short-films-section" style="background-color: #1a1a1a; color: #f0f0f0; padding: 20px; min-height: 100vh;">
+    <div class="film-details-container" style="max-width: 900px; margin: 0 auto; padding: 20px; background-color: #282828; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);">
 
-<section class="short-films-section">
-    <div class="film-details-container">
-
-        <h2>@Model.Heading</h2>
+        <h2 style="color: #ffffff; text-align: center; margin-bottom: 20px; font-size: 2.5em;">@Model.Heading</h2>
 
         <img src="@Model.Image" alt="@Model.Heading" class="film-detail-image"
+             style="display: block; margin: 0 auto 25px auto; width: 640px; height: 360px; object-fit: cover; border-radius: 8px;"
              onerror="this.onerror=null;this.src='https://placehold.co/640x360/000000/FFFFFF?text=No+Image';" />
 
-        <p><strong>Description:</strong> @Model.Description</p>
-        <p><strong>Language:</strong> @Model.Language</p>
-        <p><strong>Year:</strong> @Model.Year</p>
-        <p><strong>Genre:</strong> @string.Join(", ", Model.Genre)</p>
+        <p style="margin-bottom: 10px; font-size: 1.1em; line-height: 1.6;"><strong>Description:</strong> @Model.Description</p>
+        <p style="margin-bottom: 10px; font-size: 1.1em; line-height: 1.6;"><strong>Language:</strong> @Model.Language</p>
+        <p style="margin-bottom: 10px; font-size: 1.1em; line-height: 1.6;"><strong>Year:</strong> @Model.Year</p>
+        <p style="margin-bottom: 10px; font-size: 1.1em; line-height: 1.6;"><strong>Genre:</strong> @string.Join(", ", Model.Genre)</p>
 
         @* Film-specific *@
         @if (Model is Film film)
         {
             if (!string.IsNullOrWhiteSpace(film.Writer))
             {
-                <p><strong>Writer:</strong> @film.Writer</p>
+                <p style="margin-bottom: 10px; font-size: 1.1em; line-height: 1.6;"><strong>Writer:</strong> @film.Writer</p>
             }
             if (!string.IsNullOrWhiteSpace(film.Director))
             {
-                <p><strong>Director:</strong> @film.Director</p>
+                <p style="margin-bottom: 10px; font-size: 1.1em; line-height: 1.6;"><strong>Director:</strong> @film.Director</p>
             }
             if (film.Stars?.Any() == true)
             {
-                <p><strong>Stars:</strong> @string.Join(", ", film.Stars)</p>
+                <p style="margin-bottom: 10px; font-size: 1.1em; line-height: 1.6;"><strong>Stars:</strong> @string.Join(", ", film.Stars)</p>
             }
         }
 
@@ -42,11 +41,11 @@
         {
             if (!string.IsNullOrWhiteSpace(podcast.Host))
             {
-                <p><strong>Host:</strong> @podcast.Host</p>
+                <p style="margin-bottom: 10px; font-size: 1.1em; line-height: 1.6;"><strong>Host:</strong> @podcast.Host</p>
             }
             if (podcast.Guests?.Any() == true)
             {
-                <p><strong>Guests:</strong> @string.Join(", ", podcast.Guests)</p>
+                <p style="margin-bottom: 10px; font-size: 1.1em; line-height: 1.6;"><strong>Guests:</strong> @string.Join(", ", podcast.Guests)</p>
             }
         }
 
@@ -55,11 +54,11 @@
         {
             if (ViewBag.IsUserSignedIn != true)
             {
-                <p class="text-danger fw-bold">Please sign in to watch this exclusive movie.</p>
+                <p style="color: #dc3545; font-weight: bold; margin-top: 20px;">Please sign in to watch this exclusive movie.</p>
             }
             else if (ViewBag.IsPurchased != true)
             {
-                <p class="text-warning fw-bold">Buy this movie to watch it.</p>
+                <p style="color: #ffc107; font-weight: bold; margin-top: 20px;">Buy this movie to watch it.</p>
             }
             else
             {
@@ -67,7 +66,8 @@
                    href="@ViewBag.Link"
                    data-link="@ViewBag.Link"
                    data-signed-in="true"
-                   target="_blank">
+                   target="_blank"
+                   style="display: inline-block; background-color: #007bff; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin-top: 20px;">
                     @ViewBag.ButtonLabel
                 </a>
             }
@@ -78,12 +78,13 @@
                href="@ViewBag.Link"
                data-link="@ViewBag.Link"
                data-signed-in="@(ViewBag.IsUserSignedIn.ToString().ToLower())"
-               target="_blank">
+               target="_blank"
+               style="display: inline-block; background-color: #007bff; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin-top: 20px;">
                 @ViewBag.ButtonLabel
             </a>
         }
 
         <br />
-        <a class="btn btn-secondary mt-3" href="/">← Back to Home</a>
+        <a class="btn btn-secondary mt-3" href="/" style="display: inline-block; background-color: #6c757d; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin-top: 20px;">← Back to Home</a>
     </div>
 </section>
