@@ -15,4 +15,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\HopelessFilmies.DataAccess\HopelessFilmies.DataAccess.csproj" />
+    <ProjectReference Include="..\HopelessFilmies.Domain\HopelessFilmies.Domain.csproj" />
+    <ProjectReference Include="..\HopelessFilmies.Service\HopelessFilmies.Service.csproj" />
+  </ItemGroup>
+
 </Project>

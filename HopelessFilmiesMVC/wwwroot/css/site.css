@@ -8,11 +8,8 @@ body {
     background-color: #1a1a1a; /* Dark background for a cinematic feel */
     color: #f0f0f0; /* Light text color for contrast */
     line-height: 1.6;
-    /* Removed transition for filter, as blur-background class is removed */
+    overflow-x: hidden; /* Prevent horizontal scrollbar */
 }
-
-/* Removed body.blur-background styles */
-
 
 /* Common resets for lists */
 .nav-menu, .members-list, .roles, .contact-info-list, .social-link-list {
@@ -26,7 +23,7 @@ body {
     display: flex;
     justify-content: space-between; /* Puts logo on one end, nav on the other */
     align-items: center;
-    padding: 1rem 2rem;
+    padding: 1rem 2.5rem; /* Slightly increased horizontal padding */
     background-color: #0d0d0d; /* Even darker background for the navbar */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Subtle shadow for depth */
     border-bottom-left-radius: 10px; /* Rounded corners */
@@ -72,6 +69,7 @@ body {
     padding: 0.5rem 0.8rem;
     transition: color 0.3s ease, transform 0.3s ease; /* Smooth transition for hover effects */
     position: relative; /* Needed for underline effect */
+    display: inline-block; /* Ensure the element respects width for underline */
 }
 
     .nav-link::after {
@@ -79,7 +77,7 @@ body {
         position: absolute;
         width: 0;
         height: 2px;
-        bottom: -1px;
+        bottom: -5px; /* Slightly below the text for better visual separation */
         left: 0;
         background-color: #E74C3C; /* Red accent for the underline */
         transition: width 0.3s ease-out; /* Smooth width transition */
@@ -91,7 +89,7 @@ body {
     }
 
         .nav-link:hover::after {
-            width: 500%; /* Expand underline on hover */
+            width: 100%; /* Expand underline to full width on hover */
         }
 
 /* Sign In Button */
@@ -107,12 +105,13 @@ body {
     transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     margin-left: 2rem; /* Space from navigation links */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); /* Subtle text shadow for button text */
 }
 
     .sign-in-btn:hover {
         background-color: #C0392B; /* Darker red on hover */
-        transform: translateY(-2px); /* Lift effect */
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        transform: translateY(-3px); /* Slightly more pronounced lift effect */
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5); /* Stronger shadow on hover */
     }
 
 
@@ -123,6 +122,7 @@ body {
     color: #f0f0f0;
     cursor: pointer;
     transition: color 0.3s ease;
+    margin-left: 1rem; /* Space from the sign-in button on mobile */
 }
 
     .menu-toggle:hover {
@@ -141,18 +141,24 @@ body {
         font-size: 1.8rem; /* Adjust logo size for smaller screens */
     }
 
-    .menu-toggle {
-        display: block; /* Show the hamburger icon on small screens */
-        order: 2; /* Order it after logo and sign-in button */
-        margin-left: auto; /* Push it to the right */
-        margin-right: 1rem; /* Space from sign-in button */
+    /* Order for mobile: Logo | Sign In Button | Menu Toggle */
+    .nav-logo {
+        order: 0; /* Default */
     }
 
     .sign-in-btn {
-        order: 3; /* Order it after toggle button */
-        margin-left: 0; /* Remove default margin */
+        display: block; /* Ensure it's a block for margin-left: auto to work */
+        order: 1; /* Position after logo */
+        margin-left: auto; /* Push to the right */
         padding: 0.6rem 1.2rem;
         font-size: 0.9rem;
+    }
+
+    .menu-toggle {
+        display: block; /* Show the hamburger icon on small screens */
+        order: 2; /* Position after sign-in button */
+        /* margin-left: 1rem; already defined above for consistency */
+        margin-right: 0; /* Ensure no extra margin on the far right */
     }
 
     .nav-menu {
@@ -165,7 +171,7 @@ body {
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
         border-bottom-left-radius: 10px;
         border-bottom-right-radius: 10px;
-        padding: 1rem 0;
+        padding: 1.5rem 0; /* Increased vertical padding for mobile menu items */
         transform: translateY(-200%); /* Start hidden above the viewport */
         opacity: 0; /* Initially invisible */
         transition: transform 0.4s ease-out, opacity 0.4s ease-out; /* Smooth slide and fade */
@@ -182,7 +188,7 @@ body {
         }
 
     .nav-item {
-        margin: 0.5rem 0; /* Vertical spacing for menu items */
+        margin: 0.7rem 0; /* Increased vertical spacing for menu items */
     }
 
     .nav-link {
@@ -190,7 +196,13 @@ body {
         padding: 0.8rem 1.5rem;
         font-size: 1.2rem;
     }
+
+        /* Adjust nav-link underline for mobile to be less subtle */
+        .nav-link::after {
+            bottom: -3px; /* Slightly closer for mobile */
+        }
 }
+
 
 /* Common section padding and margin */
 .intro-section, .films, .team-members, .about, .contact-section, .footer-section {

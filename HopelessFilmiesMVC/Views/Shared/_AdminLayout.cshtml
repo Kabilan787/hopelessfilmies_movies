@@ -1,0 +1,61 @@
+﻿@* Views/Shared/_AdminLayout.cshtml *@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - Admin Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+</head>
+<body style="background-color: #111; color: #fff; font-family: Arial, sans-serif; margin: 0;">
+
+    <!-- Admin Navbar -->
+    <nav style="display: flex; justify-content: space-between; align-items: center; background-color: #222; padding: 10px 20px;">
+        <!-- Logo -->
+        <a href="~/" style="text-decoration: none; color: #fff;">
+            <h2 style="margin: 0;">Hopeless Filmies</h2>
+        </a>
+
+        <!-- Admin Links -->
+        <ul style="list-style: none; display: flex; margin: 0; padding: 0;">
+            <li style="margin-right: 20px;">
+                <a href="/Admin/Dashboard" style="color: #fff; text-decoration: none; font-weight: bold;">Dashboard</a>
+            </li>
+            <li style="margin-right: 20px;">
+                <a href="/Admin/UsersDetails" style="color: #fff; text-decoration: none; font-weight: bold;">Manage Users</a>
+            </li>
+            <li style="margin-right: 20px;">
+                <a href="/Admin/ViewContactForms" style="color: #fff; text-decoration: none; font-weight: bold;">View Contact Submissions</a>
+            </li>
+            <li>
+                <a href="/Admin/Logout" style="color: #ff6b6b; text-decoration: none; font-weight: bold;">Logout</a>
+            </li>
+        </ul>
+    </nav>
+
+    
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    
+    
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+   
+
+    <!-- Page content -->
+    <div class="container mt-4" style="padding: 20px;">
+        @RenderBody()
+    </div>
+
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>
+
+
+@section Scripts {
+    <script>
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    </script>
+}

@@ -1,6 +1,6 @@
 ﻿@using HopelessFilmiesMVC.Data
 @using HopelessFilmiesMVC.Models
-
+@model dynamic
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 
@@ -101,8 +101,8 @@ else
     <div class="film-grid">
         @if (type == "shortfilms" || type == "movies" || type == "exclusive")
         {
-            var films = Model as IEnumerable<Film>;
-            foreach (var item in films!)
+           
+            foreach (var item in Model)
             {
                 <div class="film-card">
                     @* Add-to-cart icon only for exclusive *@
@@ -125,8 +125,8 @@ else
         }
         else if (type == "podcasts")
         {
-            var podcasts = Model as IEnumerable<Podcast>;
-            foreach (var item in podcasts!)
+            
+            foreach (var item in Model)
             {
                 <div class="film-card">
                     <img src="@item.Image" alt="@item.Heading" class="film-card-image"

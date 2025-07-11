@@ -1,9 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace HopelessFilmiesMVC.Models
+namespace HopelessFilmies.Domain.Models
 {
-    [Table("Contact_Form")] // This maps to your existing table
     public class ContactForm
     {
         public int Id { get; set; }

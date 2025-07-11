@@ -1,14 +1,15 @@
-﻿using HopelessFilmiesMVC.Data;
+﻿using HopelessFilmies.Domain.Interfaces.IContact;
+using HopelessFilmiesMVC.Data;
 using HopelessFilmiesMVC.Models;
 using Microsoft.AspNetCore.Mvc;
 
 public class ContactController : Controller
 {
-    private readonly UserDbContext _context;
+    private readonly IContactService _contactService;
 
-    public ContactController(UserDbContext context)
+    public ContactController(IContactService contactService)
     {
-        _context = context;
+        _contactService = contactService;
     }
 
     // GET: /Contact
@@ -21,24 +22,26 @@ public class ContactController : Controller
 
     // POST: /Contact
     [HttpPost]
-    public IActionResult Submit(string name, string email, string message)
+    public async Task<IActionResult> Submit(string name, string email, string message)
     {
         if (!string.IsNullOrWhiteSpace(name) && !string.IsNullOrWhiteSpace(email) && !string.IsNullOrWhiteSpace(message))
         {
-            var contact = new ContactForm
-            {
-                Name = name,
-                Email = email,
-                Message = message
-            };
+            //var contact = new ContactForm
+            //{
+            //    Name = name,
+            //    Email = email,
+            //    Message = message
+            //};
 
-            _context.ContactForms.Add(contact);
-            _context.SaveChanges();
+            //_context.ContactForms.Add(contact);
+            //_context.SaveChanges();
+
+            await _contactService.AddContactAsync(name, email, message);
 
             return Ok(); // Respond with 200 OK for success
         }
 
-        return BadRequest(); // Respond with 400 Bad Request for failure
+        return BadRequest("Invalid input"); // Respond with 400 Bad Request for failure
     }
 
 

@@ -1,11 +1,11 @@
-﻿using HopelessFilmiesMVC.Models;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using HopelessFilmiesMVC.Data;
+using HopelessFilmies.Domain.Interfaces.IAccount;
 
 
 
@@ -14,11 +14,11 @@ namespace HopelessFilmiesMVC.Controllers
     public class AccountController : Controller
     {
 
-        private readonly UserDbContext _context;
+        private readonly IAccountService _accountService;
 
-        public AccountController(UserDbContext context)
+        public AccountController(IAccountService accountService)
         {
-            _context = context;
+            _accountService = accountService;
         }
 
 
@@ -33,26 +33,21 @@ namespace HopelessFilmiesMVC.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> SignIn(string email, string password) //, string? returnUrl = null)
+        public async Task<IActionResult> SignIn(string email, string password)
         {
-
-            // Check if user exists in the database
-            var user = _context.Users
-                .FirstOrDefault(u =>
-                    (u.Email == email ) &&
-                    u.Password == password); 
+            var user = await _accountService.ValidateUserAsync(email, password);
 
             if (user != null)
             {
-                // User found, create claims
                 var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.FullName),
-                new Claim(ClaimTypes.Email, user.Email),
-                // Optionally add: new Claim(ClaimTypes.Role, "User")
-            };
+        {
+            new Claim(ClaimTypes.Name, user.FullName),
+            new Claim(ClaimTypes.Email, user.Email),
+            // new Claim(ClaimTypes.Role, "User") // Optional
+        };
 
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var principal = new ClaimsPrincipal(identity);
 
                 var authProperties = new AuthenticationProperties
                 {
@@ -62,20 +57,15 @@ namespace HopelessFilmiesMVC.Controllers
 
                 await HttpContext.SignInAsync(
                     CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimsIdentity),
+                    principal,
                     authProperties);
 
                 return RedirectToAction("Index", "Home");
             }
-            else
-            {
-                // Invalid credentials
-                ViewBag.Message = "Invalid email/phone or password.";
-                return View();
-            }
+
+            ViewBag.Message = "Invalid email/phone or password.";
+            return View();
         }
-
-
 
 
 
@@ -111,22 +101,14 @@ namespace HopelessFilmiesMVC.Controllers
                 return View();
             }
 
-            // Save to DB
-            var user = new User
-            {
-                FullName = fullName,
-                Email = email,
-                Password = password 
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            _accountService.AddUser(fullName, email, password);
+            await _accountService.SaveChangesAsync();
 
             return RedirectToAction("SignIn", new { message = "Account created successfully. Please sign in." });
         }
 
         [HttpGet]
-        public IActionResult MyMovies()
+        public async Task<IActionResult> MyMovies()
         {
             if (!User.Identity.IsAuthenticated)
             {
@@ -134,53 +116,33 @@ namespace HopelessFilmiesMVC.Controllers
             }
 
             var email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-            var user = _context.Users.FirstOrDefault(u => u.Email == email);
-
-            if (user == null || string.IsNullOrEmpty(user.PurchasedMovies))
+            if (string.IsNullOrEmpty(email))
             {
-                return View(new List<Film>());
+                return RedirectToAction("SignIn", new { message = "User email not found." });
             }
 
-            var movieTitles = user.PurchasedMovies
-                .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                .Select(m => m.Trim())
-                .ToList();
-
-            var purchasedFilms = _context.Films
-                .Where(f => movieTitles.Contains(f.Heading))
-                .ToList();
-
-            return View(purchasedFilms);
+            var films = await _accountService.GetPurchasedMoviesAsync(email);
+            return View(films);
         }
 
 
         [HttpPost]
-        public IActionResult RemoveMovie([FromBody] string title)
+        public async Task<IActionResult> RemoveMovie([FromBody] string title)
         {
             if (!User.Identity.IsAuthenticated)
                 return Unauthorized();
 
             var email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-            var user = _context.Users.FirstOrDefault(u => u.Email == email);
 
-            if (user == null)
+            if (string.IsNullOrWhiteSpace(email))
                 return Unauthorized();
 
-            var movies = (user.PurchasedMovies ?? "")
-                            .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                            .Select(m => m.Trim())
-                            .ToList();
+            var result = await _accountService.RemovePurchasedMovieAsync(email, title);
 
-            if (movies.Contains(title))
-            {
-                movies.Remove(title);
-                user.PurchasedMovies = string.Join(", ", movies);
-                _context.SaveChanges();
-
+            if (result)
                 return Json(new { success = true });
-            }
-
-            return Json(new { success = false, message = "Movie not found." });
+            else
+                return Json(new { success = false, message = "Movie not found or couldn't be removed." });
         }
 
 

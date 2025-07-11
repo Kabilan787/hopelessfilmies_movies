@@ -6,7 +6,7 @@
     var title = isEdit ? "Edit" : "Add";
     title += isPodcast ? " Podcast" : " Film";
     ViewData["Title"] = title;
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <style>
@@ -179,7 +179,7 @@
 <div class="form-container">
     <h2>@title</h2>
 
-    <form id="mediaForm" asp-action="SaveMedia" method="post">
+    <form id="mediaForm" asp-action="SaveMedia" method="post" enctype="multipart/form-data">
         <input type="hidden" name="Id" value="@(isEdit ? Model.Id : 0)" />
         <input type="hidden" name="Category" value="@(isPodcast ? "Podcasts" : (Model != null ? Model.Category : ""))" />
 
@@ -213,8 +213,19 @@
             <textarea name="Description" class="form-control">@(isEdit ? Model.Description : "")</textarea>
         </div>
         <div class="mb-3">
-            <label class="form-label">Image URL</label>
-            <input name="Image" value="@(isEdit ? Model.Image : "")" class="form-control" />
+            <label class="form-label">Current Image</label><br />
+            @if (isEdit && !string.IsNullOrEmpty(Model.Image))
+            {
+                <img src="@Model.Image"
+                     alt="Current Image"
+                     style="max-width: 200px; height: auto; border-radius: 5px;"
+                     onerror="this.onerror=null;this.src='https://placehold.co/200x120?text=No+Image';" />
+            }
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Upload New Image</label>
+            <input type="file" name="ImageFile" class="form-control" accept="image/*" />
         </div>
 
         @if (isPodcast)
@@ -313,13 +324,15 @@
             $('#mediaForm').submit(function (e) {
                 e.preventDefault(); // Prevent full form submit
 
-                const form = $(this);
-                const formData = form.serialize();
+                const form = $(this)[0]; // Get raw DOM element
+                const formData = new FormData(form); // Create FormData object
 
                 $.ajax({
                     type: 'POST',
-                    url: form.attr('action'),
+                    url: $(this).attr('action'),
                     data: formData,
+                    processData: false,  // Prevent jQuery from processing the data
+                    contentType: false,  // Prevent jQuery from setting contentType
                     success: function (response) {
                         console.log("AJAX Success Response:", response); // Log the full response
                         if (response.success) {
